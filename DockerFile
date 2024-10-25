@@ -1,0 +1,14 @@
+FROM node:18
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+ARG BACKEND_PORT=3000
+ENV BACKEND_PORT=$PORT
+EXPOSE $BACKEND_PORT 
+
+CMD ["node", "server.js"]
