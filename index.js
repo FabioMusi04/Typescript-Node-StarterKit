@@ -17,6 +17,10 @@ app.get("/helloboss", (req, res) => {
     res.send("Hello Boss");
 });
 
+app.get("/helloboss2", (req, res) => {
+    res.send("Hello Boss 2");
+});
+
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
