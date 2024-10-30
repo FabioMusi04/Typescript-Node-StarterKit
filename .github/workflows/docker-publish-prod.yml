@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Docker Image CI && Deploy on render
 
 on:
   push:
@@ -28,3 +28,11 @@ jobs:
           context: .
           push: true
           tags: ilmusi/backend_render:production
+      
+      - name: Deploy to production
+        if: github.ref == 'refs/heads/main'
+        uses: johnbeynon/render-deploy-action@v0.0.8
+        with:
+          service-id: ${{ secrets.RENDER_SERVICE_PROD_ID }}
+          api-key: ${{ secrets.RENDER_API_KEY }}
+          wait-for-success: true

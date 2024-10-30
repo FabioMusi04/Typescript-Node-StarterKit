@@ -28,3 +28,11 @@ jobs:
           context: .
           push: true
           tags: ilmusi/backend_render:develop
+
+      - name: Deploy to development
+        if: github.ref == 'refs/heads/develop'
+        uses: johnbeynon/render-deploy-action@v0.0.8
+        with:
+          service-id: ${{ secrets.RENDER_SERVICE_DEV_ID }}
+          api-key: ${{ secrets.RENDER_API_KEY }}
+          wait-for-success: true
