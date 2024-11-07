@@ -2,18 +2,41 @@
   "name": "devops",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "tsx": "npx tsx index.ts"
   },
+  "type": "module",
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/cors": "^2.8.17",
+    "@types/dotenv-safe": "^8.1.6",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/lodash": "^4.17.13",
+    "@types/mongoose": "^5.11.97",
+    "@types/passport": "^1.0.17",
+    "@types/passport-jwt": "^4.0.1",
+    "bodymen": "^1.1.1",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.21.1"
+    "dotenv-safe": "^9.1.0",
+    "express": "^4.21.1",
+    "lodash": "^4.17.21",
+    "mongodb": "^6.10.0",
+    "mongoose": "^8.8.0",
+    "querymen": "^2.1.4"
   },
   "devDependencies": {
-    "jest": "^29.7.0"
+    "@types/express": "^5.0.0",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.9.0",
+    "@typescript-eslint/parser": "^8.13.0",
+    "jest": "^29.7.0",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
   }
 }
