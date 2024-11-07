@@ -1,5 +1,4 @@
 import mongoose, { Document, Schema } from 'mongoose';
-import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import { UsersRoleEnum } from '../../utils/enum.ts';
 import { checkFieldsAlreadyExist, hashPassword } from './middlewares/index.ts';
@@ -37,7 +36,6 @@ const userSchema = new Schema<IUser>({
   },
   salt: {
     type: String,
-    required: true,
   },
   firstName: {
     type: String,
@@ -69,11 +67,6 @@ const userSchema = new Schema<IUser>({
 
 userSchema.pre<IUser>('save', checkFieldsAlreadyExist);
 userSchema.pre<IUser>('save', hashPassword);
-
-/* userSchema.post<IUser>('save', function(doc, next) {
-  console.log('A user has been saved:', doc);
-  next();
-}); */
 
 userSchema.methods.toJSON = function() {
   const user = this.toObject();

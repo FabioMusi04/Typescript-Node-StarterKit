@@ -1,29 +1,44 @@
-// authMiddleware.ts
 import { Request, Response, NextFunction } from 'express';
 import passport from 'passport';
-import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
+import { Strategy as LocalStrategy } from 'passport-local';
 import { UsersRoleEnum } from '../../utils/enum.ts'
 import config from '../../config.ts';
 import { JwtPayload } from './jwt.ts';
+import User, { IUser } from '../../api/users/model.ts';
 
 const secretKey = config.jwtSecret;
 const masterKey = config.masterKey;
 
+
 passport.use(
-    new JwtStrategy(
+    'login',
+    new LocalStrategy(
         {
-            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-            secretOrKey: secretKey,
+            usernameField: 'email',
+            passwordField: 'password'
         },
-        (jwtPayload: JwtPayload, done) => {
+        async (email, password, done) => {
             try {
-                return done(null, jwtPayload);
+                const user = await User.findOne({ email });
+
+                if (!user) {
+                    return done(null, false, { message: 'User not found' });
+                }
+
+                const validate = true // await user.isValidPassword(password);
+
+                if (!validate) {
+                    return done(null, false, { message: 'Wrong Password' });
+                }
+
+                return done(null, user, { message: 'Logged in Successfully' });
             } catch (error) {
-                return done(error, false);
+                return done(error);
             }
         }
     )
 );
+
 
 export const token = (requiredRole?: UsersRoleEnum, useMasterKey: boolean = false) => {
     return (req: Request, res: Response, next: NextFunction) => {
