@@ -1,55 +1,47 @@
 import mongoose from 'mongoose';
 import config from '../../config.ts';
+import { generalLogger } from '../logger/winston.ts';
 
 const mongoUri = config.mongo.uri;
 const maxRetries = 5;
 let retries = 0;
 
 if (!mongoUri) {
-    console.error("MongoDB URI not found in environment variables. Check your .env file.");
+    generalLogger.error('MONGODB: ', { message: 'MongoDB URI is missing' });
     process.exit(1);
 }
 
 const connectToDatabase = async () => {
     try {
         await mongoose.connect(mongoUri);
-        console.log('Successfully connected to MongoDB');
+        generalLogger.info('MONGODB: ', { message: 'Connected to MongoDB' });
     } catch (error) {
-        console.error(`MongoDB connection error: ${error.message}`);
+        generalLogger.error('MONGODB: ', { message: `Failed to connect to MongoDB: ${error.message}` });
 
         if (retries < maxRetries) {
             retries += 1;
-            console.log(`Retrying connection attempt ${retries}/${maxRetries}...`);
+            generalLogger.info('MONGODB: ', { message: `Retrying connection in 5 seconds. Attempt ${retries}/${maxRetries}` });
             setTimeout(connectToDatabase, 5000);
         } else {
-            console.error("Exceeded maximum connection attempts. Exiting.");
+            generalLogger.error('MONGODB: ', { message: 'Failed to connect to MongoDB after 5 retries' });
             process.exit(1);
         }
     }
 };
 
 mongoose.connection.on('connected', () => {
-    console.log('Mongoose connected to database');
+    generalLogger.info('MONGODB: ', { message: 'Mongoose connected to MongoDB' });
     retries = 0;
 });
 
 mongoose.connection.on('error', (err) => {
-    console.error(`Mongoose connection error: ${err}`);
+    generalLogger.error('MONGODB: ', { message: `Mongoose connection error: ${err.message}` });
+    process.exit(1);
 });
 
 mongoose.connection.on('disconnected', () => {
-    console.warn('Mongoose disconnected. Attempting to reconnect...');
+    generalLogger.warn('MONGODB: ', { message: 'Mongoose disconnected from MongoDB' });
     connectToDatabase();
 });
-
-const gracefulShutdown = (signal: string) => {
-    mongoose.connection.close().then(() => {
-        console.log(`Mongoose disconnected through ${signal}. Closing app.`);
-        process.exit(0);
-    });
-};
-
-process.on('SIGINT', () => gracefulShutdown('app termination (SIGINT)'));
-process.on('SIGTERM', () => gracefulShutdown('app termination (SIGTERM)'));
 
 export default connectToDatabase;

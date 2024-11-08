@@ -3,6 +3,8 @@ import { fileURLToPath } from 'url';
 import os from 'os';
 import dotenv from 'dotenv-safe';
 import _ from 'lodash';
+import winston from 'winston';
+import { generalLogger } from './services/logger/winston.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,7 +17,7 @@ const requireProcessEnv = (name: string): string => {
         if (process.env.NODE_ENV !== 'docs') {
             throw new Error('You must set the ' + name + ' environment variable');
         } else {
-            console.warn('You must set the ' + name + ' environment variable');
+            generalLogger.warn('ENV: ', { message: 'You must set the ' + name + ' environment variable' });
         }
     }
     return process.env[name] as string;
@@ -27,6 +29,10 @@ if (process.env.NODE_ENV !== 'production') {
         path: path.join(__dirname, '../.env'),
         example: path.join(__dirname, '../.env.example')
     });
+
+  /*   generalLogger.add(new winston.transports.Console({
+        format: winston.format.simple(),
+    })); */
 }
 
 const APP_NAME = requireProcessEnv('APP_NAME');

@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import config from '../../config.ts'
 import { UsersRoleEnum } from '../../utils/enum.ts';
 import { IUser } from '../../api/users/model.ts'
+import { generalLogger } from '../logger/winston.ts';
 
 const secretKey = config.jwtSecret
 
@@ -21,7 +22,7 @@ export const verifyToken = (token: string): JwtPayload | null => {
     try {
         return jwt.verify(token, secretKey) as JwtPayload;
     } catch (error) {
-        console.error('Invalid token', error);
+        generalLogger.error('JWT: ', { message: error.message });
         return null;
     }
 };

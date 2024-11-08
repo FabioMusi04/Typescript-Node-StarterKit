@@ -4,9 +4,12 @@ import config from './src/config.ts';
 import cors from 'cors';
 import connectToDatabase from './src/services/mongo/mongo.ts';
 import passportConfig from './src/services/auth/auth.ts';
+import { generalLogger, requestLogger } from './src/services/logger/winston.ts';
 
 const app: Application = express();
 const port: number = config.port || 3000;
+
+app.use(requestLogger);
 
 app.use(passportConfig.initialize());
 
@@ -24,9 +27,9 @@ setImmediate(async () => {
         await connectToDatabase();
 
         app.listen(port, () => {
-            console.log(`Server is running on http://localhost:${port}`);
+            generalLogger.info('SERVER: ', { message: `Server started on port ${port}` });
         });
     } catch (error) {
-        console.error('Error connecting to MongoDB', error);
+        generalLogger.error('SERVER: ', { message: error.message });
     }
 });
