@@ -25,12 +25,11 @@ const getStatusCodeColor = (statusCode: number) => {
   }
   return 'white'; // Default color for other status codes
 };
-
 const httpCustomFormat = printf(({ level, message, timestamp, ...metadata }) => {
   const [method, url, statusCode] = message.split(' ');
 
-  const coloredMethod = winston.format.colorize().colorize(method.toLowerCase(), message.split(' ')[0]);
-  const coloredStatusCode = winston.format.colorize().colorize(getStatusCodeColor(statusCode), statusCode);
+  const coloredMethod = winston.format.colorize().colorize(method.toLowerCase(), method);
+  const coloredStatusCode = winston.format.colorize().colorize(getStatusCodeColor(Number(statusCode)), statusCode);
 
   return `${timestamp} [${level}] ${coloredMethod} ${url} ${coloredStatusCode} ${message.split(' ').slice(3).join(' ')} ${JSON.stringify(metadata)}`;
 });
@@ -39,13 +38,19 @@ const httpLogger = winston.createLogger({
   level: 'http',
   format: combine(
     timestamp(),
-    colorize(),
     httpCustomFormat 
   ),
   transports: [
-    new winston.transports.Console(),
+    new winston.transports.Console({
+      format: combine(
+        winston.format.colorize(),
+        timestamp(),
+        httpCustomFormat
+      ),
+    }),
   ],
 });
+
 
 const generalLogger = winston.createLogger({
   level: 'info',
