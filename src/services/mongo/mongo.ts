@@ -42,14 +42,4 @@ mongoose.connection.on('disconnected', () => {
     connectToDatabase();
 });
 
-const gracefulShutdown = (signal: string) => {
-    mongoose.connection.close().then(() => {
-        console.log(`Mongoose disconnected through ${signal}. Closing app.`);
-        process.exit(0);
-    });
-};
-
-process.on('SIGINT', () => gracefulShutdown('app termination (SIGINT)'));
-process.on('SIGTERM', () => gracefulShutdown('app termination (SIGTERM)'));
-
 export default connectToDatabase;

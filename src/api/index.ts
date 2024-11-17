@@ -2,6 +2,9 @@ import express, { Application, Router } from 'express';
 import { readdirSync, statSync } from 'fs';
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec, postmanSpec } from '../services/docs/docs.ts';
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -47,7 +50,15 @@ const loadRoutes = async (): Promise<void> => {
 // Load routes asynchronously
 loadRoutes().catch(err => console.error(`Error loading routes: ${err}`));
 
-// Static route for apiDoc
-router.use('/api', express.static(path.join(__dirname, '../../docs')));
+// Swagger setup
+router.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+router.get("/swagger.json", (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  res.send(swaggerSpec);
+});
+router.get("/postman.json", (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  res.send(postmanSpec);
+});
 
 export default router;
