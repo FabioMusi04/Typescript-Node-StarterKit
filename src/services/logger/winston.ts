@@ -43,7 +43,7 @@ const httpLogger = winston.createLogger({
   transports: [
     new winston.transports.Console({
       format: combine(
-        winston.format.colorize(),
+        winston.format.colorize({ all: true }),
         timestamp(),
         httpCustomFormat
       ),
@@ -56,7 +56,7 @@ const generalLogger = winston.createLogger({
   level: 'info',
   format: combine(
     timestamp(),
-    colorize(),
+    colorize({ all: true }),
     printf(({ level, message, timestamp, ...metadata }) => {
       return `${timestamp} [${level}] ${message} ${JSON.stringify(metadata)}`;
     })
