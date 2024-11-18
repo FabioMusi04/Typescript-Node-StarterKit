@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { login, register } from './controller.ts';
 import { authenticate } from '../../services/auth/auth.ts';
+import { registerSchema } from './middlewares/index.ts';
+import { validateData } from '../../services/validator/body/index.ts';
 
 const router = Router();
 
@@ -33,7 +35,7 @@ const router = Router();
  *       400:
  *         description: Bad request
  */
-router.post('/register', register);
+router.post('/register', validateData(registerSchema), register);
 
 /**
  * @swagger

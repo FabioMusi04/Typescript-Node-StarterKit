@@ -5,7 +5,7 @@
   "main": "index.ts",
   "scripts": {
     "test": "jest",
-    "tsx": "npx tsx index.ts",
+    "tsx": "npx tsx watch index.ts",
     "docs": "npx tsx ./src/services/docs/docsgenerator.ts"
   },
   "type": "module",
@@ -24,7 +24,6 @@
     "@types/passport-local": "^1.0.38",
     "@types/winston": "^2.4.4",
     "bcrypt": "^5.1.1",
-    "bodymen": "^1.1.1",
     "cors": "^2.8.5",
     "dotenv-safe": "^9.1.0",
     "express": "^4.21.1",
@@ -37,10 +36,10 @@
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
-    "querymen": "^2.1.4",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
-    "winston": "^3.17.0"
+    "winston": "^3.17.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
