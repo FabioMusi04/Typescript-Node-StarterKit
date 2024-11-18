@@ -10,10 +10,11 @@ export async function hashPassword(this: IUser, next: () => void) {
 }
 
 export async function checkFieldsAlreadyExist(this: IUser, next: () => void) {
-    if (this.isModified('email')) {
-        const user = await User.findOne({ email: this.email });
+    if (this.isModified('email') || this.isModified('username')) {
+        const user = await User.findOne({ $or: [{ email: this.email }, { username: this.username }] });
         if (user) {
-            this.invalidate('email', 'email must be unique');
+            if (user.email === this.email) this.invalidate('email', 'email must be unique');
+            if (user.username === this.username) this.invalidate('username', 'username must be unique');
         }
     }
 

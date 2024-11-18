@@ -6,11 +6,11 @@ winston.addColors({
   post: 'blue',
   put: 'yellow',
   delete: 'red',
-  patch: 'purple',
+  patch: 'magenta',
   success: 'green',  // For 2xx status codes
   redirection: 'yellow', // For 3xx status codes
   clientError: 'red', // For 4xx status codes
-  serverError: 'purple', // For 5xx status codes
+  serverError: 'magenta', // For 5xx status codes
 });
 
 const getStatusCodeColor = (statusCode: number) => {
