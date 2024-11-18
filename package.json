@@ -33,6 +33,7 @@
     "logform": "^2.7.0",
     "mongodb": "^6.10.0",
     "mongoose": "^8.8.0",
+    "mongoose-to-swagger": "^1.5.1",
     "openapi-to-postmanv2": "^4.24.0",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",

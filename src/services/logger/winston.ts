@@ -1,4 +1,3 @@
-import { TransformableInfo } from 'logform';
 import winston from 'winston';
 const { combine, timestamp, colorize, printf } = winston.format;
 
@@ -33,8 +32,6 @@ const httpCustomFormat = printf((info: winston.Logform.TransformableInfo) => {
     getStatusCodeColor(Number(statusCode)) || 'default',
     statusCode.toString()
   );
-
-
 
   return `${timestamp} [${level}] ${coloredMethod} ${url} ${coloredStatusCode} ${(message as string).split(' ').slice(3).join(' ')} ${JSON.stringify(metadata)}`;
 });
