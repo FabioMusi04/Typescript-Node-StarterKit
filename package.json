@@ -28,6 +28,7 @@
     "express": "^4.21.1",
     "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
+    "logform": "^2.7.0",
     "mongodb": "^6.10.0",
     "mongoose": "^8.8.0",
     "openapi-to-postmanv2": "^4.24.0",
@@ -36,7 +37,8 @@
     "passport-local": "^1.0.0",
     "querymen": "^2.1.4",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "winston": "^3.17.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
