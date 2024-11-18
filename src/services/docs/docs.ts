@@ -47,9 +47,6 @@ const swaggerDefinition = {
   apis: ["./src/api/**/*.ts"],
 };
 
-console.log(swaggerDefinition.swaggerDefinition.components.schemas);
-
-
 export const swaggerSpec = swaggerJsdoc(swaggerDefinition);
 
 let postmanSpec: CollectionDefinition | null = null;
