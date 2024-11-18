@@ -15,7 +15,6 @@ export interface IUser extends Document {
   isActive: boolean;
   createdAt?: Date;
   updatedAt?: Date;
-  toJSON(): Omit<IUser, 'password' | 'salt'>;
 }
 
 const userSchema = new Schema<IUser>({

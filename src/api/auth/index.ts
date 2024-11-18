@@ -19,7 +19,13 @@ const router = Router();
  *             properties:
  *               username:
  *                 type: string
+ *               email:
+ *                 type: string
  *               password:
+ *                 type: string
+ *               firstName:
+ *                 type: string
+ *               lastName:
  *                 type: string
  *     responses:
  *       200:
