@@ -4,7 +4,7 @@ import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 import { generalLogger } from '../services/logger/winston.ts';
 import swaggerUi from 'swagger-ui-express';
-import { swaggerSpec, postmanSpec } from '../services/docs/docs.ts';
+import { swaggerSpec } from '../services/docs/docs.ts';
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -53,13 +53,5 @@ loadRoutes().catch(err => generalLogger.error('ROUTES: ', { message: err }));
 
 // Swagger setup
 router.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-router.get("/swagger.json", (req, res) => {
-  res.setHeader("Content-Type", "application/json");
-  res.send(swaggerSpec);
-});
-router.get("/postman.json", (req, res) => {
-  res.setHeader("Content-Type", "application/json");
-  res.send(postmanSpec);
-});
 
 export default router;

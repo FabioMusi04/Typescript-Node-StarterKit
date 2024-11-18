@@ -14,17 +14,19 @@ const __dirname = path.dirname(__filename);
 
 export const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
-export let postmanSpec: CollectionDefinition | null = null;
+let postmanSpec: CollectionDefinition | null = null;
 
-converter.convert({ type: 'string', data: JSON.stringify(swaggerSpec) },
-  {}, (err, conversionResult) => {
-    if (!conversionResult.result) {
-      generalLogger.error('POSTMAN: collection not generated', conversionResult.reason);
+export function generatePostmanDoc() {
+  converter.convert({ type: 'string', data: JSON.stringify(swaggerSpec) },
+    {}, (err, conversionResult) => {
+      if (!conversionResult.result) {
+        generalLogger.error('POSTMAN: collection not generated', conversionResult.reason);
+      }
+      else {
+        generalLogger.info('POSTMAN: collection generated successfully');
+        fs.writeFileSync(path.join(__dirname, 'postman.json'), JSON.stringify(conversionResult.output[0].data));
+        postmanSpec = conversionResult.output[0].data;
+      }
     }
-    else {
-      generalLogger.info('POSTMAN: collection generated successfully');
-      fs.writeFileSync(path.join(__dirname, 'postman.json'), JSON.stringify(conversionResult.output[0].data));
-      postmanSpec = conversionResult.output[0].data;
-    }
-  }
-);
+  );
+}
