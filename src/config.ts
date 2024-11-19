@@ -3,7 +3,6 @@ import { fileURLToPath } from 'url';
 import os from 'os';
 import dotenv from 'dotenv-safe';
 import _ from 'lodash';
-import winston from 'winston';
 import { generalLogger } from './services/logger/winston.ts';
 
 const __filename = fileURLToPath(import.meta.url);
