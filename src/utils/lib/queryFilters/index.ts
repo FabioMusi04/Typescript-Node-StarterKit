@@ -27,18 +27,39 @@ export function buildFilterObject(filterQuery: any): object {
  * @returns {object} - A sanitized filter object with only valid fields.
  */
 export function validateFilterFields(filter: any, schema: Schema): object {
-    const validFields = Object.keys(schema.paths);
     const sanitizedFilter: any = {};
-
-    Object.keys(filter).forEach((key) => {
-        const field = schema.paths[key];
-        if (field && field.options.q) {
-            sanitizedFilter[key] = filter[key];
-        } else {
-            console.warn(`Field '${key}' is not queryable.`);
+    const filterObject: { [key: string]: any } = stringToObject(filter);
+    for (const key in filterObject) {
+        if (schema.obj.hasOwnProperty(key)) {
+            const field = schema.obj[key];
+            if (field && typeof field === 'object' && 'q' in field) {
+                sanitizedFilter[key] = filterObject[key];
+            } else {
+                console.warn(`Field '${key}' is not queryable.`);
+            }
         }
-    });
+    }
 
     return sanitizedFilter;
 }
 
+/**
+ * Converts a string in the format "{key=value}" into an object.
+ * @param {string} str - The input string.
+ * @returns {object} - The parsed object.
+ */
+function stringToObject(str: string): object {
+    str = str.trim().replace(/^\{/, "").replace(/\}$/, "");
+
+    const pairs = str.split(",");
+
+    const result: any = {};
+    for (const pair of pairs) {
+        const [key, value] = pair.split("=").map((item) => item.trim());
+        if (key) {
+            result[key] = isNaN(Number(value)) ? value : Number(value);
+        }
+    }
+
+    return result;
+}
