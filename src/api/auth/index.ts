@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { login, register } from './controller.ts';
 import { authenticate } from '../../services/auth/auth.ts';
-import { registerSchema } from './middlewares/index.ts';
-import { validateData } from '../../services/validator/body/index.ts';
+import { loginSchema, registerSchema } from './middlewares/index.ts';
+import { validateBody } from '../../services/validator/body/index.ts';
 
 const router = Router();
 
@@ -35,7 +35,7 @@ const router = Router();
  *       400:
  *         description: Bad request
  */
-router.post('/register', validateData(registerSchema), register);
+router.post('/register', validateBody(registerSchema), register);
 
 /**
  * @swagger
@@ -60,7 +60,7 @@ router.post('/register', validateData(registerSchema), register);
  *       401:
  *         description: Unauthorized
  */
-router.post('/login', login);
+router.post('/login', validateBody(loginSchema), login);
 
 /**
  * @swagger
