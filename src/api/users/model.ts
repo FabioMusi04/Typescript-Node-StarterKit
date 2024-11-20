@@ -22,12 +22,14 @@ const userSchema = new Schema<IUser>({
     type: String,
     required: true,
     unique: true,
+    q: true,
   },
   email: {
     type: String,
     required: true,
     unique: true,
     immutable: true,
+    q: true,
   },
   password: {
     type: String,
@@ -39,10 +41,12 @@ const userSchema = new Schema<IUser>({
   firstName: {
     type: String,
     required: true,
+    q: true,
   },
   lastName: {
     type: String,
     required: true,
+    q: true,
   },
   profilePicture: {
     type: String,
@@ -55,6 +59,7 @@ const userSchema = new Schema<IUser>({
     type: String,
     enum: UsersRoleEnum,
     default: UsersRoleEnum.USER,
+    q: true,
   },
   isActive: {
     type: Boolean,
