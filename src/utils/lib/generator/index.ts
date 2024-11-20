@@ -1,5 +1,7 @@
-import { Model } from 'mongoose';
+import { Model, SortOrder } from 'mongoose';
 import { Request, Response } from 'express';
+import { buildFilterObject, validateFilterFields } from '../queryFilters/index.ts';
+import { querySchema } from './middlewares/index.ts';
 
 type ControllerFunctions = {
     create: (req: Request, res: Response) => Promise<void>;
@@ -33,14 +35,34 @@ export function generateControllers(model: Model<any>, name: string): Controller
         /**
          * Get all documents
          */
-        getAll: async (_req: Request, res: Response) => {
+        getAll: async (req: Request, res: Response) => {
             try {
-                const docs = await model.find();
-                res.status(200).json(docs);
+                const validatedQuery = querySchema.parse(req.query);
+                const { page = 1, limit = 10, filter = {}, sort = {} } = validatedQuery;
+
+                const filterObject = validateFilterFields(JSON.parse(filter as string), model.schema);
+
+                const docs = await model
+                    .find(filterObject)
+                    .skip((page - 1) * limit)
+                    .limit(limit)
+                    .sort(sort)
+                    .exec();
+        
+                const totalDocs = await model.countDocuments(filterObject);
+        
+                res.status(200).json({
+                    totalDocs,
+                    totalPages: Math.ceil(totalDocs / limit),
+                    currentPage: page,
+                    docs,
+                });
             } catch (error) {
-                res.status(500).json({ message: `Failed to fetch ${name}s: ${error.message}` });
+                res.status(400).json({ message: 'Invalid query parameters' });
             }
         },
+
+
 
         /**
          * Get a document by ID
