@@ -40,7 +40,6 @@ export function generateControllers(model: Model<any>, name: string): Controller
                 const validatedQuery = querySchema.parse(req.query);
                 const { page = 1, limit = 10, filter = {}, sort = {} } = validatedQuery;
                 const filterObject = validateFilterFields(filter as string, model.schema);
-                console.log(filterObject);
                 const docs = await model
                     .find(filterObject)
                     .skip((page - 1) * limit)

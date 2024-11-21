@@ -39,7 +39,7 @@ export function validateFilterFields(filter: any, schema: Schema): object {
             }
         }
     }
-
+    
     return sanitizedFilter;
 }
 
@@ -49,8 +49,17 @@ export function validateFilterFields(filter: any, schema: Schema): object {
  * @returns {object} - The parsed object.
  */
 function stringToObject(str: string): object {
-    str = str.trim().replace(/^\{/, "").replace(/\}$/, "");
+    if (!str) {
+        return {};
+    }
+    if (typeof str === 'object') {
+        return str;
+    }
+    if (str === "{}") {
+        return {};
+    }
 
+    str = str.trim().replace(/^\{/, "").replace(/\}$/, "");
     const pairs = str.split(",");
 
     const result: any = {};
@@ -60,6 +69,5 @@ function stringToObject(str: string): object {
             result[key] = isNaN(Number(value)) ? value : Number(value);
         }
     }
-
     return result;
 }
