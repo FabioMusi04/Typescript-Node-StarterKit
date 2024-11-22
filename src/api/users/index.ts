@@ -52,6 +52,57 @@ router.get('/', controllers.getAll);
  */
 router.get('/:id', controllers.getById);
 
+
+/**
+ * @swagger
+* /users/{id}/remove:
+ *   get:
+ *     summary: Soft delete a user by ID
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The user ID
+ *     responses:
+ *       200:
+ *         description: A single user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       404:
+ *         description: User not found
+ */
+router.get('/:id/remove', controllers.remove);
+
+/**
+ * @swagger
+ * /users/{id}/restore:
+ *   get:
+ *     summary: Restore a soft-deleted user
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The user ID
+ *     responses:
+ *       200:
+ *         description: The restored user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       404:
+ *         description: User not found
+ */
+router.get('/:id/restore', controllers.restore);
+
 /**
  * @swagger
  * /users:
@@ -113,7 +164,7 @@ router.put('/:id', controllers.update);
  * @swagger
  * /users/{id}:
  *   delete:
- *     summary: Delete a user by ID
+ *     summary: Permanently delete a user
  *     tags: [Users]
  *     parameters:
  *       - in: path
@@ -128,6 +179,6 @@ router.put('/:id', controllers.update);
  *       404:
  *         description: User not found
  */
-router.delete('/:id', controllers.remove);
+router.delete('/:id', controllers.deletePermanently);
 
 export default router;

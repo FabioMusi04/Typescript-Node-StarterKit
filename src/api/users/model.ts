@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import { UsersRoleEnum } from '../../utils/enum.ts';
 import { checkFieldsAlreadyExist, hashPassword } from './middlewares/index.ts';
 import mongooseToSwagger from 'mongoose-to-swagger';
+import softDeletePlugin from '../../utils/lib/softDelete/index.ts';
 export interface IUser extends Document {
   username: string;
   email: string;
@@ -71,6 +72,8 @@ const userSchema = new Schema<IUser>({
 
 userSchema.pre<IUser>('save', checkFieldsAlreadyExist);
 userSchema.pre<IUser>('save', hashPassword);
+
+userSchema.plugin(softDeletePlugin);
 
 userSchema.methods.toJSON = function() {
   const user = this.toObject();

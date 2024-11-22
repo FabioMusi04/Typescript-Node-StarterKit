@@ -8,7 +8,9 @@ type ControllerFunctions = {
     getAll: (req: Request, res: Response) => Promise<void>;
     getById: (req: Request, res: Response) => Promise<void>;
     update: (req: Request, res: Response) => Promise<void>;
+    deletePermanently: (req: Request, res: Response) => Promise<void>;
     remove: (req: Request, res: Response) => Promise<void>;
+    restore: (req: Request, res: Response) => Promise<void>;
 };
 
 /**
@@ -33,23 +35,23 @@ export function generateControllers(model: Model<any>, name: string): Controller
         },
 
         /**
-         * Get all documents
+         * Get all documents, excluding soft-deleted ones by default
          */
         getAll: async (req: Request, res: Response) => {
             try {
                 const validatedQuery = querySchema.parse(req.query);
                 const { page = 1, limit = 10, filter = {}, sort = {} } = validatedQuery;
                 const filterObject = validateFilterFields(filter as string, model.schema);
-                console.log("filterObject", filterObject);
+                
                 const docs = await model
                     .find(filterObject)
                     .skip((page - 1) * limit)
                     .limit(limit)
                     .sort(sort)
                     .exec();
-        
+
                 const totalDocs = await model.countDocuments(filterObject);
-        
+
                 res.status(200).json({
                     totalDocs,
                     totalPages: Math.ceil(totalDocs / limit),
@@ -61,53 +63,103 @@ export function generateControllers(model: Model<any>, name: string): Controller
             }
         },
 
-
-
         /**
-         * Get a document by ID
+         * Get a document by ID, excluding soft-deleted ones by default
          */
         getById: async (req: Request, res: Response) => {
             try {
-                const doc = await model.findById(req.params.id);
+                const doc = await model.findOne({
+                    _id: req.params.id,
+                    isDeleted: false, // Exclude soft-deleted documents
+                });
+
                 if (!doc) {
                     res.status(404).json({ message: `${name} not found` });
+                } else {
+                    res.status(200).json(doc);
                 }
-                res.status(200).json(doc);
             } catch (error) {
                 res.status(500).json({ message: `Failed to fetch ${name}: ${error.message}` });
             }
         },
 
         /**
-         * Update a document by ID
+         * Update a document by ID, excluding soft-deleted ones
          */
         update: async (req: Request, res: Response) => {
             try {
-                const updatedDoc = await model.findByIdAndUpdate(req.params.id, req.body, {
-                    new: true,
-                    runValidators: true,
-                });
+                const updatedDoc = await model.findOneAndUpdate(
+                    { _id: req.params.id, isDeleted: false }, // Exclude soft-deleted documents
+                    req.body,
+                    { new: true, runValidators: true }
+                );
+
                 if (!updatedDoc) {
                     res.status(404).json({ message: `${name} not found` });
+                } else {
+                    res.status(200).json(updatedDoc);
                 }
-                res.status(200).json(updatedDoc);
             } catch (error) {
                 res.status(400).json({ message: `Failed to update ${name}: ${error.message}` });
             }
         },
 
         /**
-         * Delete a document by ID
+         * Soft delete a document by ID
          */
         remove: async (req: Request, res: Response) => {
             try {
-                const deletedDoc = await model.findByIdAndDelete(req.params.id);
+                const deletedDoc = await model.findOneAndUpdate(
+                    { _id: req.params.id, isDeleted: false }, // Exclude already soft-deleted documents
+                    { isDeleted: true, deletedAt: new Date() },
+                    { new: true }
+                );
+
                 if (!deletedDoc) {
-                    res.status(404).json({ message: `${name} not found` });
+                    res.status(404).json({ message: `${name} not found or already deleted` });
+                } else {
+                    res.status(200).json({ message: `${name} soft deleted successfully` });
                 }
-                res.status(200).json({ message: `${name} deleted successfully` });
             } catch (error) {
                 res.status(500).json({ message: `Failed to delete ${name}: ${error.message}` });
+            }
+        },
+
+        /**
+         * Permanently delete a document by ID
+         */
+        deletePermanently: async (req: Request, res: Response) => {
+            try {
+                const permanentlyDeletedDoc = await model.findByIdAndDelete(req.params.id);
+
+                if (!permanentlyDeletedDoc) {
+                    res.status(404).json({ message: `${name} not found` });
+                } else {
+                    res.status(200).json({ message: `${name} permanently deleted successfully` });
+                }
+            } catch (error) {
+                res.status(500).json({ message: `Failed to permanently delete ${name}: ${error.message}` });
+            }
+        },
+
+        /**
+         * Restore a soft-deleted document by ID
+         */
+        restore: async (req: Request, res: Response) => {
+            try {
+                const restoredDoc = await model.findOneAndUpdate(
+                    { _id: req.params.id, isDeleted: true },
+                    { isDeleted: false, deletedAt: null },
+                    { new: true }
+                );
+
+                if (!restoredDoc) {
+                    res.status(404).json({ message: `${name} not found or not soft deleted` });
+                } else {
+                    res.status(200).json({ message: `${name} restored successfully`, restoredDoc });
+                }
+            } catch (error) {
+                res.status(500).json({ message: `Failed to restore ${name}: ${error.message}` });
             }
         },
     };

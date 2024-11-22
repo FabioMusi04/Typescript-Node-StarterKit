@@ -26,14 +26,15 @@ export function buildFilterObject(filterQuery: any): object {
  * @param {Schema} schema - The Mongoose schema to validate against.
  * @returns {object} - A sanitized filter object with only valid fields.
  */
+
 export function validateFilterFields(filter: any, schema: Schema): object {
     const sanitizedFilter: any = {};
     const filterObject: { [key: string]: any } = stringToObject(filter);
 
     for (const key in filterObject) {
-        if (schema.obj.hasOwnProperty(key)  || key === 'createdAt' || key === 'updatedAt') {
-            const field = schema.obj[key];
-            if ((field && typeof field === 'object' && 'q' in field) || key === 'createdAt' || key === 'updatedAt') {
+        if (schema.paths.hasOwnProperty(key)) {
+            const field = schema.paths[key];
+            if (field && typeof field === 'object' && 'q' in field.options && field.options.q === true) {
                 sanitizedFilter[key] = filterObject[key];
             } else {
                 console.warn(`Field '${key}' is not queryable.`);
@@ -73,8 +74,7 @@ function stringToObject(str: string): object {
                 if (Date.parse(operatorValue)) {
                     result[key] = {
                         [operator]: 
-                           new Date(operatorValue)
-                        
+                           new Date(operatorValue)                  
                     };
                 } else {
                     result[key] = {
