@@ -133,9 +133,6 @@ npm run test
 ---
 
 ## **Planned Enhancements**
-### 1. Query Validator
-- Extend input validation to include complex query parameter validation.
-
 ### 2. Authentication System
 - Complete the integration
 

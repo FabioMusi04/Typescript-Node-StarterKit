@@ -24,7 +24,6 @@ const connectToDatabase = async () => {
             setTimeout(connectToDatabase, 5000);
         } else {
             generalLogger.error('MONGODB: ', { message: 'Failed to connect to MongoDB after 5 retries' });
-            process.exit(1);
         }
     }
 };
@@ -36,7 +35,6 @@ mongoose.connection.on('connected', () => {
 
 mongoose.connection.on('error', (err) => {
     generalLogger.error('MONGODB: ', { message: `Mongoose connection error: ${err.message}` });
-    process.exit(1);
 });
 
 mongoose.connection.on('disconnected', () => {
