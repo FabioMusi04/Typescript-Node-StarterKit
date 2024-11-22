@@ -22,10 +22,10 @@ src/
 │   │   ├── controller.ts    # Auth controllers
 │   │   └── index.ts         # Export file
 │   ├── users/               # User-related API logic
-│       ├── middlewares/     # User middlewares
-│       ├── controller.ts    # User controllers
-│       ├── model.ts         # Mongoose user schema
-│       └── index.ts         # Export file
+│   │   ├── middlewares/     # User middlewares
+│   │   ├── controller.ts    # User controllers
+│   │   ├── model.ts         # Mongoose user schema
+│   │   └── index.ts         # Export file
 ├── services/
 │   ├── auth/                # Authentication services
 │   │   ├── auth.ts          # Auth helper functions
@@ -38,7 +38,8 @@ src/
 │   ├── mongo/               # MongoDB database connection
 │   │   └── mongo.ts         # Mongoose connection setup
 │   ├── validator/           # Request validators
-│   │   └── body             # Zod-based body validators
+│   │   ├── body             # Zod-based body validators
+│   │   └── query            # Zod-based query validators     
 ├── utils/                   # Utility functions
 │   ├── libs                 # Custom error handling
 │   │   └── generator        # Dynamic controller generator
@@ -147,7 +148,3 @@ npm run test
 - **Swagger Docs:** Use `docs` to view the API documentation in a browser or export to Postman.
 - **Logging:** Centralized logging setup helps track application and HTTP activity.
 - **Jest:** Comprehensive testing suite to ensure your app works as expected.
-
----
-
-This documentation provides an overview of your starter kit's structure and functionality. Let me know if you need additional details for specific sections!
