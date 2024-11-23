@@ -134,19 +134,16 @@ npm run test
 ---
 
 ## **Planned Enhancements**
-### 1. Error Handling middleware:
-- Implement a centralized error handling middleware to manage exceptions and errors.
-
-### 2. Rate Limiting and DDoS Protection:
+### 1. Rate Limiting and DDoS Protection:
 - Implement rate limiting and DDoS protection to secure the application from malicious attacks.
 
-### 3. Improved Controller Generator
+### 2. Improved Controller Generator
 - Refine the dynamic controller generator to support more complex use cases.
 
-### 4. ESLint and Prettier Integration
+### 3. ESLint and Prettier Integration
 - Integrate ESLint and Prettier for code quality and consistency.
 
-### 5. Database Indexing
+### 4. Database Indexing
 - Implement database indexing to improve query performance.
 ---
 
