@@ -31,7 +31,7 @@ export const register: RequestHandler = async (req: Request, res: Response, next
 export const login = (req: Request, res: Response, next: NextFunction): void => {
     passport.authenticate(
         'login',
-        async (err: any, user: IUser, info: any) => {
+        async (err: Error | null, user: IUser) => {
             try {
                 if (err || !user) {
                     const error = new Error('An error occurred.');

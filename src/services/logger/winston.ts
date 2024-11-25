@@ -1,4 +1,6 @@
 import winston from 'winston';
+import { Request, Response, NextFunction } from 'express';
+
 const { combine, timestamp, colorize, printf } = winston.format;
 
 winston.addColors({
@@ -68,7 +70,7 @@ const generalLogger = winston.createLogger({
   ],
 });
 
-export const requestLogger = (req: { method: any; url: any; }, res: { on?: any; statusCode?: any; }, next: () => void) => {
+export const requestLogger = (req: Request, res: Response, next: NextFunction) => {
   const start = Date.now();
 
   res.on('finish', () => {

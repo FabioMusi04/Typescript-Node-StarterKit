@@ -1,4 +1,4 @@
-import express, { Application, Router } from 'express';
+import { Router } from 'express';
 import { readdirSync, statSync } from 'fs';
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';

@@ -51,6 +51,7 @@ const userSchema = new Schema<IUser>({
   },
   profilePicture: {
     type: String,
+    // eslint-disable-next-line no-unused-vars
     default: function(this: IUser) {
       const hash = crypto.createHash('md5').update(this.username || this.email).digest('hex');
       return `https://identicons.github.com/${hash}.png`;

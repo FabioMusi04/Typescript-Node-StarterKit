@@ -28,10 +28,6 @@ if (process.env.NODE_ENV !== 'production') {
         path: path.join(__dirname, '../.env'),
         example: path.join(__dirname, '../.env.example')
     });
-
-  /*   generalLogger.add(new winston.transports.Console({
-        format: winston.format.simple(),
-    })); */
 }
 
 const APP_NAME = requireProcessEnv('APP_NAME');
@@ -59,6 +55,7 @@ interface Config {
     expressSSLRedirect?: boolean;
 }
 
+// eslint-disable-next-line no-unused-vars
 const config: { [key in 'all' | 'test' | 'development' | 'production']: Partial<Config> } = {
     all: {
         appName: _.capitalize(APP_NAME),

@@ -3,7 +3,6 @@ import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 import fs from 'fs';
 import converter from 'openapi-to-postmanv2'
-import { CollectionDefinition } from 'postman-collection';
 import { generalLogger } from '../logger/winston.ts';
 import { readdirSync, statSync } from 'fs';
 
@@ -49,8 +48,6 @@ const swaggerDefinition = {
 
 export const swaggerSpec = swaggerJsdoc(swaggerDefinition);
 
-let postmanSpec: CollectionDefinition | null = null;
-
 export function generatePostmanDoc() {
   converter.convert({ type: 'string', data: JSON.stringify(swaggerSpec) },
     {}, (err, conversionResult) => {
@@ -60,7 +57,6 @@ export function generatePostmanDoc() {
       else {
         generalLogger.info('POSTMAN: collection generated successfully');
         fs.writeFileSync(path.join(__dirname, 'postman.json'), JSON.stringify(conversionResult.output[0].data));
-        postmanSpec = conversionResult.output[0].data;
       }
     }
   );
