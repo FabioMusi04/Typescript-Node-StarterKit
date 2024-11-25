@@ -13,6 +13,8 @@ export interface IUser extends Document {
   lastName: string;
   profilePicture?: string;
   role: UsersRoleEnum;
+  socialProvider?: string;
+  identityId?: string;
   isActive: boolean;
   createdAt?: Date;
   updatedAt?: Date;
@@ -34,7 +36,9 @@ const userSchema = new Schema<IUser>({
   },
   password: {
     type: String,
-    required: true,
+    required: function(this: IUser) {
+      return !this.socialProvider; // Password is required only if no social provider
+    },
   },
   salt: {
     type: String,
@@ -66,9 +70,18 @@ const userSchema = new Schema<IUser>({
     type: Boolean,
     default: true,
   },
+  socialProvider: {
+    type: String, // e.g., "google", "facebook"
+    required: false,
+  },
+  identityId: {
+    type: String, // The unique ID from the social provider
+    required: false,
+  },
 }, {
   timestamps: true,
 });
+
 
 userSchema.pre<IUser>('save', checkFieldsAlreadyExist);
 userSchema.pre<IUser>('save', hashPassword);

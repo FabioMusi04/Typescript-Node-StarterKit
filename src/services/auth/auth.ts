@@ -21,7 +21,7 @@ passport.use(
         },
         async (email, password, done) => {
             try {
-                const user = await User.findOne({ email });
+                const user = await User.findOne({ email, socialProvider: { $exists: false }, identityId: { $exists: false } });
 
                 if (!user) {
                     return done(null, false, { message: 'User not found' });
