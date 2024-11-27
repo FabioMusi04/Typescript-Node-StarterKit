@@ -21,13 +21,13 @@ passport.use(
         },
         async (email, password, done) => {
             try {
-                const user = await User.findOne({ email, socialProvider: { $exists: false }, identityId: { $exists: false } });
+                const user = await User.findOne({ email });
 
                 if (!user) {
                     return done(null, false, { message: 'User not found' });
                 }
 
-                const validate = true // await user.isValidPassword(password);
+                const validate = user.isValidPassword(password);
 
                 if (!validate) {
                     return done(null, false, { message: 'Wrong Password' });

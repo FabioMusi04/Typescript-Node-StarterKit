@@ -24,6 +24,9 @@ export interface IUser extends Document {
   isActive: boolean;
   createdAt?: Date;
   updatedAt?: Date;
+
+  toJSON(): IUser;
+  isValidPassword(password: string): boolean;
 }
 
 const userSchema = new Schema<IUser>({
@@ -99,7 +102,12 @@ userSchema.methods.toJSON = function() {
   const user = this.toObject();
   delete user.password;
   delete user.salt;
+  delete user.socialProviders;
   return user;
+};
+
+userSchema.methods.isValidPassword = function(password: string) {
+  return this.password === crypto.pbkdf2Sync(password, this.salt, 1000, 64, 'sha512').toString('hex');
 };
 
 const User = mongoose.model<IUser>('User', userSchema);
