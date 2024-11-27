@@ -4,6 +4,12 @@ import { UsersRoleEnum } from '../../utils/enum.ts';
 import { checkFieldsAlreadyExist, hashPassword } from './middlewares/index.ts';
 import mongooseToSwagger from 'mongoose-to-swagger';
 import softDeletePlugin from '../../utils/lib/softDelete/index.ts';
+import _ from 'lodash';
+
+export interface SocialProvider {
+  providerName: string;
+  identityId: string;
+}
 export interface IUser extends Document {
   username: string;
   email: string;
@@ -13,7 +19,7 @@ export interface IUser extends Document {
   lastName: string;
   profilePicture?: string;
   role: UsersRoleEnum;
-  socialProvider?: string;
+  socialProviders?: SocialProvider[];
   identityId?: string;
   isActive: boolean;
   createdAt?: Date;
@@ -37,7 +43,7 @@ const userSchema = new Schema<IUser>({
   password: {
     type: String,
     required: function(this: IUser) {
-      return !this.socialProvider; // Password is required only if no social provider
+      return _.isEmpty(this.socialProviders) || _.isNil(this.socialProviders);
     },
   },
   salt: {
@@ -68,16 +74,17 @@ const userSchema = new Schema<IUser>({
   },
   isActive: {
     type: Boolean,
-    default: true,
+    default: false,
   },
-  socialProvider: {
-    type: String, // e.g., "google", "facebook"
-    required: false,
-  },
-  identityId: {
-    type: String, // The unique ID from the social provider
-    required: false,
-  },
+  socialProviders: {
+    type: [
+      {
+        providerName: String,
+        identityId: String,
+      }
+    ],
+    default: undefined,
+  }
 }, {
   timestamps: true,
 });

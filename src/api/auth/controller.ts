@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction, RequestHandler } from 'express';
 import passport from 'passport';
-import User, { IUser } from '../users/model.ts'
+import User, { IUser, SocialProvider } from '../users/model.ts'
 import { UsersRoleEnum } from '../../utils/enum.ts';
 import { generateToken } from '../../services/auth/jwt.ts';
 import client, { account } from '../../services/appwrite/index.ts';
 import { OAuthProvider, Query, Users } from 'node-appwrite';
-import Config from '../../config.ts';
+import _ from 'lodash';
 
 const users = new Users(client);
 
@@ -90,28 +90,53 @@ export const authSuccess = async (req: Request, res: Response, next: NextFunctio
         const lastName = lastNameParts.join(' ');
         const username = email.split('@')[0];
 
+        const socialProviders = _.map(identity.identities, (identity) => {
+            return {
+                providerName: identity.provider,
+                identityId: identity.$id,
+            } as SocialProvider;
+        });
+
         const userData: Partial<IUser> = {
             username,
             email,
-            socialProvider: OAuthProvider.Google,
-            identityId: identity.identities[0].$id,
+            socialProviders,
             firstName: firstName || '',
             lastName: lastName || '',
             role: UsersRoleEnum.USER,
         };
         
-        let existingUser = await User.findOne({ email: user.email });
+        let existingUser = await User.findOne({
+            email,
+            socialProviders: {
+                $all: socialProviders,
+            },
+        });
 
         if (!existingUser) {
-            const newUser = new User(userData);
-            existingUser = await newUser.save();
+            await User.updateOne({
+                email,
+            }, userData,
+            {
+                upsert: true,
+            });
+
+            existingUser = await User.findOne({
+                email,
+                socialProviders: {
+                    $all: socialProviders,
+                },
+            });
+
+            if (!existingUser) {
+                throw new Error('There was an error creating the user');
+            }
         }
 
         const token = generateToken(existingUser);
         res.status(200).json({ token });
         
     } catch (error) {
-        console.log("Error:", error);
         res.json({ ERROR: (error as Error).message });
     }
 };
