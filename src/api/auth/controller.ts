@@ -38,8 +38,6 @@ export const login = (req: Request, res: Response, next: NextFunction): void => 
         'login',
         async (err: Error | null, user: IUser) => {
             try {
-                console.log('err', err);
-                console.log('user', user);
                 if (err || !user) {
                     const error = new Error('An error occurred.');
 
