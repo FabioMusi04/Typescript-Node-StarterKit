@@ -1,7 +1,7 @@
 import { Model } from 'mongoose';
 import { Request, Response } from 'express';
 import { validateFilterFields } from '../queryFilters/index.ts';
-import { querySchema } from './middlewares/index.ts';
+import { getByIdSchema, querySchema } from './middlewares/index.ts';
 
 /* eslint-disable no-unused-vars */
 type ControllerFunctions = {
@@ -71,8 +71,10 @@ export function generateControllers(model: Model<unknown>, name: string): Contro
          */
         getById: async (req: Request, res: Response) => {
             try {
+                const { id } = getByIdSchema.parse(req.params);
+
                 const doc = await model.findOne({
-                    _id: req.params.id,
+                    _id: id,
                     isDeleted: false, // Exclude soft-deleted documents
                 });
 
@@ -91,11 +93,15 @@ export function generateControllers(model: Model<unknown>, name: string): Contro
          */
         update: async (req: Request, res: Response) => {
             try {
-                const updatedDoc = await model.findOneAndUpdate(
-                    { _id: req.params.id, isDeleted: false }, // Exclude soft-deleted documents
-                    req.body,
-                    { new: true, runValidators: true }
-                );
+                const { id } = getByIdSchema.parse(req.params);
+                const updatedDoc = await model.findOne({ _id: id, isDeleted: false });
+                if (!updatedDoc) {
+                    res.status(404).json({ message: `${name} not found` });
+                } else {   
+                    updatedDoc.set(req.body);
+                    await updatedDoc.save();
+                    res.status(200).json(updatedDoc);
+                }
 
                 if (!updatedDoc) {
                     res.status(404).json({ message: `${name} not found` });
@@ -112,8 +118,9 @@ export function generateControllers(model: Model<unknown>, name: string): Contro
          */
         remove: async (req: Request, res: Response) => {
             try {
+                const { id } = getByIdSchema.parse(req.params);
                 const deletedDoc = await model.findOneAndUpdate(
-                    { _id: req.params.id, isDeleted: false }, // Exclude already soft-deleted documents
+                    { _id: id, isDeleted: false }, // Exclude already soft-deleted documents
                     { isDeleted: true, deletedAt: new Date() },
                     { new: true }
                 );
@@ -133,7 +140,8 @@ export function generateControllers(model: Model<unknown>, name: string): Contro
          */
         deletePermanently: async (req: Request, res: Response) => {
             try {
-                const permanentlyDeletedDoc = await model.findByIdAndDelete(req.params.id);
+                const { id } = getByIdSchema.parse(req.params);
+                const permanentlyDeletedDoc = await model.findByIdAndDelete(id);
 
                 if (!permanentlyDeletedDoc) {
                     res.status(404).json({ message: `${name} not found` });
@@ -150,8 +158,9 @@ export function generateControllers(model: Model<unknown>, name: string): Contro
          */
         restore: async (req: Request, res: Response) => {
             try {
+                const { id } = getByIdSchema.parse(req.params);
                 const restoredDoc = await model.findOneAndUpdate(
-                    { _id: req.params.id, isDeleted: true },
+                    { _id: id, isDeleted: true },
                     { isDeleted: false, deletedAt: null },
                     { new: true }
                 );
