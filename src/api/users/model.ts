@@ -5,6 +5,7 @@ import { checkFieldsAlreadyExist, hashPassword } from './middlewares/index.ts';
 import mongooseToSwagger from 'mongoose-to-swagger';
 import softDeletePlugin from '../../utils/lib/softDelete/index.ts';
 import _ from 'lodash';
+import bcrypt from 'bcrypt';
 
 export interface SocialProvider {
   providerName: string;
@@ -107,8 +108,8 @@ userSchema.methods.toJSON = function() {
   return user;
 };
 
-userSchema.methods.isValidPassword = function(password: string) {
-  return this.password === crypto.pbkdf2Sync(password, this.salt, 1000, 64, 'sha512').toString('hex');
+userSchema.methods.isValidPassword = async function(password: string) {
+  return await bcrypt.compare(password, this.password);
 };
 
 const User = mongoose.model<IUser>('User', userSchema);
