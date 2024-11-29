@@ -1,6 +1,6 @@
-import { FilterQuery, Schema } from "mongoose";
+import { Schema } from "mongoose";
 
-const softDeletePlugin = (schema: Schema, options = {}) => {
+const softDeletePlugin = (schema: Schema) => {
     schema.add({
         isDeleted: { type: Boolean, default: false, q: true },
         deletedAt: { type: Date, default: null, q: true },
@@ -34,7 +34,8 @@ const softDeletePlugin = (schema: Schema, options = {}) => {
         );
     };
 
-    schema.pre(/^find/, function <Filter extends Record<string, any>>(this: any, next: () => void) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    schema.pre(/^find/, function <Filter extends Record<string, unknown>>(this: any, next: () => void) {
         const filter = this.getFilter() as Filter;
         if (filter.isDeleted === undefined) {
             this.where({ isDeleted: {

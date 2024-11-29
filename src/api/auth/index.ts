@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { login, register } from './controller.ts';
+import { authGoogle, authSuccess, login, register } from './controller.ts';
 import { authenticate } from '../../services/auth/auth.ts';
 import { loginSchema, registerSchema } from './middlewares/index.ts';
 import { validateBody } from '../../services/validator/body/index.ts';
@@ -61,6 +61,11 @@ router.post('/register', validateBody(registerSchema), register);
  *         description: Unauthorized
  */
 router.post('/login', validateBody(loginSchema), login);
+
+
+router.get('/google', authGoogle);
+
+router.get('/google/success', authSuccess);
 
 /**
  * @swagger

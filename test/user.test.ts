@@ -1,5 +1,6 @@
+/* eslint-disable no-undef */
 import mongoose from 'mongoose';
-import User, { IUser } from '../src/api/users/model.ts';
+import User from '../src/api/users/model.ts';
 import { UsersRoleEnum } from '../src/utils/enum.ts';
 
 describe('User Model Test', () => {

@@ -1,11 +1,13 @@
 import { Schema } from 'mongoose';
+import _ from 'lodash';
+import { generalLogger } from '../../../services/logger/winston.ts';
 
 /**
  * Builds a Mongoose filter object from the filter query string.
  * @param {any} filterQuery - The raw filter query string (parsed from req.query).
  * @returns {object} - The Mongoose-compatible filter object.
  */
-export function buildFilterObject(filterQuery: any): object {
+export function buildFilterObject(filterQuery: string): object {
     let filterObject = {};
 
     if (filterQuery) {
@@ -13,7 +15,7 @@ export function buildFilterObject(filterQuery: any): object {
             const parsedFilter = JSON.parse(filterQuery);
             filterObject = parsedFilter;
         } catch (error) {
-            throw new Error('Invalid filter query format');
+            throw new Error('Invalid filter query format ', error?.message);
         }
     }
 
@@ -27,43 +29,37 @@ export function buildFilterObject(filterQuery: any): object {
  * @returns {object} - A sanitized filter object with only valid fields.
  */
 
-export function validateFilterFields(filter: any, schema: Schema): object {
-    const sanitizedFilter: any = {};
-    const filterObject: { [key: string]: any } = stringToObject(filter);
-
+export function validateFilterFields(filter: string, schema: Schema): Record<string, unknown> {
+    const sanitizedFilter: Record<string, unknown> = {};
+    const filterObject: Record<string, unknown> = stringToObject(filter);
+    
     for (const key in filterObject) {
-        if (schema.paths.hasOwnProperty(key)) {
+        if (_.has(schema.paths, key)) {
             const field = schema.paths[key];
             if (field && typeof field === 'object' && 'q' in field.options && field.options.q === true) {
                 sanitizedFilter[key] = filterObject[key];
             } else {
-                console.warn(`Field '${key}' is not queryable.`);
+                generalLogger.warn(`Field ${key} is not queryable`);
             }
         }
     }
-
-    return sanitizedFilter;
+    
+    return sanitizedFilter;    
 }
 
-/**
- * Converts a string in the format "{key=value}" into an object.
- * Supports nested operators like `$lte` and parses dates into `Date` objects.
- * @param {string} str - The input string.
- * @returns {object} - The parsed object.
- */
-function stringToObject(str: string): object {
+function stringToObject(str: string): Record<string, unknown> {
     if (!str || str === "{}") {
         return {};
     }
 
     if (typeof str === "object") {
-        return str;
+        return str as Record<string, unknown>;
     }
 
     str = str.trim().replace(/^\{/, "").replace(/\}$/, "");
 
     const pairs = str.split(",");
-    const result: any = {};
+    const result: Record<string, unknown> = {};
 
     for (const pair of pairs) {
         const [key, value] = pair.split("=").map((item) => item.trim());
@@ -73,12 +69,11 @@ function stringToObject(str: string): object {
                 const [operator, operatorValue] = value.split(":").map((item) => item.trim());
                 if (Date.parse(operatorValue)) {
                     result[key] = {
-                        [operator]: 
-                           new Date(operatorValue)                  
+                        [operator]: new Date(operatorValue),
                     };
                 } else {
                     result[key] = {
-                        [operator]: operatorValue
+                        [operator]: operatorValue,
                     };
                 }
             } else {
@@ -89,3 +84,4 @@ function stringToObject(str: string): object {
 
     return result;
 }
+

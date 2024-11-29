@@ -28,10 +28,6 @@ if (process.env.NODE_ENV !== 'production') {
         path: path.join(__dirname, '../.env'),
         example: path.join(__dirname, '../.env.example')
     });
-
-  /*   generalLogger.add(new winston.transports.Console({
-        format: winston.format.simple(),
-    })); */
 }
 
 const APP_NAME = requireProcessEnv('APP_NAME');
@@ -43,6 +39,12 @@ interface MongoConfig {
         strictPopulate: boolean;
         debug?: boolean;
     };
+}
+
+interface AppWriteConfig {
+    projectId: string;
+    apiKey: string;
+    endpoint: string;
 }
 
 interface Config {
@@ -57,8 +59,10 @@ interface Config {
     mongo: MongoConfig;
     clientUrl: string;
     expressSSLRedirect?: boolean;
+    appwrite: AppWriteConfig;
 }
 
+// eslint-disable-next-line no-unused-vars
 const config: { [key in 'all' | 'test' | 'development' | 'production']: Partial<Config> } = {
     all: {
         appName: _.capitalize(APP_NAME),
@@ -77,6 +81,11 @@ const config: { [key in 'all' | 'test' | 'development' | 'production']: Partial<
             uri: process.env.MONGODB_URI || `mongodb://localhost:27888/${APP_NAME}-dev`
         },
         clientUrl: process.env.CLIENT_URL || 'http://localhost:5173',
+        appwrite: {
+            projectId: requireProcessEnv('APPWRITE_PROJECT_ID'),
+            apiKey: requireProcessEnv('APPWRITE_API_KEY'),
+            endpoint: requireProcessEnv('APPWRITE_ENDPOINT')
+        }
     },
     test: {
         mongo: {
