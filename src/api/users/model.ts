@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Document, Model, Schema } from 'mongoose';
 import crypto from 'crypto';
 import { UsersRoleEnum } from '../../utils/enum.ts';
 import { checkFieldsAlreadyExist, hashPassword } from './middlewares/index.ts';
@@ -25,12 +25,18 @@ export interface IUser extends Document {
   isActive: boolean;
   createdAt?: Date;
   updatedAt?: Date;
-
-  toJSON(): IUser;
-  isValidPassword(password: string): boolean;
 }
 
-const userSchema = new Schema<IUser>({
+interface IUserMethods {
+  toJSON(): Record<string, unknown>;
+  // eslint-disable-next-line no-unused-vars
+  isValidPassword(password: string): Promise<boolean>;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+type UserModel = Model<IUser, {}, IUserMethods>;
+
+const userSchema = new Schema<IUser, UserModel, IUserMethods>({
   username: {
     type: String,
     required: true,
@@ -46,7 +52,7 @@ const userSchema = new Schema<IUser>({
   },
   password: {
     type: String,
-    required: function(this: IUser) {
+    required: function() {
       return _.isEmpty(this.socialProviders) || _.isNil(this.socialProviders);
     },
   },
@@ -102,17 +108,14 @@ userSchema.plugin(softDeletePlugin);
 
 userSchema.methods.toJSON = function() {
   const user = this.toObject();
-  delete user.password;
-  delete user.salt;
-  delete user.socialProviders;
-  return user;
+  return _.omit(user, ['password', 'salt', '__v', 'socialProviders']);
 };
 
 userSchema.methods.isValidPassword = async function(password: string) {
-  return await bcrypt.compare(password, this.password);
+  return bcrypt.compare(password, this.password);
 };
 
-const User = mongoose.model<IUser>('User', userSchema);
+const User = mongoose.model<IUser, UserModel>('User', userSchema);
 export const swaggerSchema = mongooseToSwagger(User);
 
 
