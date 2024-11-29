@@ -22,7 +22,7 @@ type ControllerFunctions = {
  * @param {string} name - The name of the model (for error messages and logs).
  * @returns {ControllerFunctions} - CRUD controllers for the model.
  */
-export function generateControllers(model: Model<unknown>, name: string): ControllerFunctions {
+export function generateControllers<T>(model: Model<T>, name: string): ControllerFunctions {
     return {
         /**
          * Create a new document
