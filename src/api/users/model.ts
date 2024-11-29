@@ -4,6 +4,12 @@ import { UsersRoleEnum } from '../../utils/enum.ts';
 import { checkFieldsAlreadyExist, hashPassword } from './middlewares/index.ts';
 import mongooseToSwagger from 'mongoose-to-swagger';
 import softDeletePlugin from '../../utils/lib/softDelete/index.ts';
+import _ from 'lodash';
+
+export interface SocialProvider {
+  providerName: string;
+  identityId: string;
+}
 export interface IUser extends Document {
   username: string;
   email: string;
@@ -13,9 +19,14 @@ export interface IUser extends Document {
   lastName: string;
   profilePicture?: string;
   role: UsersRoleEnum;
+  socialProviders?: SocialProvider[];
+  identityId?: string;
   isActive: boolean;
   createdAt?: Date;
   updatedAt?: Date;
+
+  toJSON(): IUser;
+  isValidPassword(password: string): boolean;
 }
 
 const userSchema = new Schema<IUser>({
@@ -34,7 +45,9 @@ const userSchema = new Schema<IUser>({
   },
   password: {
     type: String,
-    required: true,
+    required: function(this: IUser) {
+      return _.isEmpty(this.socialProviders) || _.isNil(this.socialProviders);
+    },
   },
   salt: {
     type: String,
@@ -65,11 +78,21 @@ const userSchema = new Schema<IUser>({
   },
   isActive: {
     type: Boolean,
-    default: true,
+    default: false,
   },
+  socialProviders: {
+    type: [
+      {
+        providerName: String,
+        identityId: String,
+      }
+    ],
+    default: undefined,
+  }
 }, {
   timestamps: true,
 });
+
 
 userSchema.pre<IUser>('save', checkFieldsAlreadyExist);
 userSchema.pre<IUser>('save', hashPassword);
@@ -80,7 +103,12 @@ userSchema.methods.toJSON = function() {
   const user = this.toObject();
   delete user.password;
   delete user.salt;
+  delete user.socialProviders;
   return user;
+};
+
+userSchema.methods.isValidPassword = function(password: string) {
+  return this.password === crypto.pbkdf2Sync(password, this.salt, 1000, 64, 'sha512').toString('hex');
 };
 
 const User = mongoose.model<IUser>('User', userSchema);

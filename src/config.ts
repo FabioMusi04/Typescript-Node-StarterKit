@@ -41,6 +41,12 @@ interface MongoConfig {
     };
 }
 
+interface AppWriteConfig {
+    projectId: string;
+    apiKey: string;
+    endpoint: string;
+}
+
 interface Config {
     appName: string;
     env: string;
@@ -53,6 +59,7 @@ interface Config {
     mongo: MongoConfig;
     clientUrl: string;
     expressSSLRedirect?: boolean;
+    appwrite: AppWriteConfig;
 }
 
 // eslint-disable-next-line no-unused-vars
@@ -74,6 +81,11 @@ const config: { [key in 'all' | 'test' | 'development' | 'production']: Partial<
             uri: process.env.MONGODB_URI || `mongodb://localhost:27888/${APP_NAME}-dev`
         },
         clientUrl: process.env.CLIENT_URL || 'http://localhost:5173',
+        appwrite: {
+            projectId: requireProcessEnv('APPWRITE_PROJECT_ID'),
+            apiKey: requireProcessEnv('APPWRITE_API_KEY'),
+            endpoint: requireProcessEnv('APPWRITE_ENDPOINT')
+        }
     },
     test: {
         mongo: {
