@@ -62,7 +62,7 @@ export const login = (req: Request, res: Response, next: NextFunction): void => 
     )(req, res, next);
 };
 
-export const authGoogle = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const authGoogle = async (req: Request, res: Response): Promise<void> => {
     try {
         const redirectURL = await account.createOAuth2Token(OAuthProvider.Google,
             `http://localhost:3000/auth/google/success`)
@@ -74,10 +74,10 @@ export const authGoogle = async (req: Request, res: Response, next: NextFunction
     }
 };
 
-export const authSuccess = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const authSuccess = async (req: Request, res: Response): Promise<void> => {
     try {
         const { userId, secret } = req.query as { userId: string; secret: string };
-        const session = await account.createSession(userId, secret);
+        await account.createSession(userId, secret);
 
         const user = await users.get(userId);
 
