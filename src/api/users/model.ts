@@ -1,11 +1,12 @@
-import mongoose, { Document, Model, Schema } from 'mongoose';
+import mongoose, { Document, Model } from 'mongoose';
 import crypto from 'crypto';
 import { UsersRoleEnum } from '../../utils/enum.ts';
 import { checkFieldsAlreadyExist, hashPassword } from './middlewares/index.ts';
 import mongooseToSwagger from 'mongoose-to-swagger';
 import softDeletePlugin from '../../utils/lib/softDelete/index.ts';
 import _ from 'lodash';
-import bcrypt from 'bcrypt';
+import { isValidPassword, toJSON } from './utils/index.ts';
+import { ConfigurableSchema } from '../../utils/lib/mongoose/index.ts';
 
 export interface SocialProvider {
   providerName: string;
@@ -36,7 +37,7 @@ interface IUserMethods {
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 type UserModel = Model<IUser, {}, IUserMethods>;
 
-const userSchema = new Schema<IUser, UserModel, IUserMethods>({
+const userSchema = new ConfigurableSchema<IUser, UserModel, IUserMethods>({
   username: {
     type: String,
     required: true,
@@ -52,7 +53,7 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>({
   },
   password: {
     type: String,
-    required: function() {
+    required: function () {
       return _.isEmpty(this.socialProviders) || _.isNil(this.socialProviders);
     },
   },
@@ -72,7 +73,7 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>({
   profilePicture: {
     type: String,
     // eslint-disable-next-line no-unused-vars
-    default: function(this: IUser) {
+    default: function (this: IUser) {
       const hash = crypto.createHash('md5').update(this.username || this.email).digest('hex');
       return `https://identicons.github.com/${hash}.png`;
     }
@@ -98,25 +99,19 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>({
   }
 }, {
   timestamps: true,
+  configuration: {
+    pre: {
+      save: [checkFieldsAlreadyExist, hashPassword],
+    },
+    methods: {
+      toJSON,
+      isValidPassword,
+    },
+    plugins: [softDeletePlugin],
+  },
 });
-
-
-userSchema.pre<IUser>('save', checkFieldsAlreadyExist);
-userSchema.pre<IUser>('save', hashPassword);
-
-userSchema.plugin(softDeletePlugin);
-
-userSchema.methods.toJSON = function() {
-  const user = this.toObject();
-  return _.omit(user, ['password', 'salt', '__v', 'socialProviders']);
-};
-
-userSchema.methods.isValidPassword = async function(password: string) {
-  return bcrypt.compare(password, this.password);
-};
 
 const User = mongoose.model<IUser, UserModel>('User', userSchema);
 export const swaggerSchema = mongooseToSwagger(User);
-
 
 export default User;
