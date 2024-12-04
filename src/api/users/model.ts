@@ -108,6 +108,16 @@ const userSchema = new ConfigurableSchema<IUser, UserModel, IUserMethods>({
       isValidPassword,
     },
     plugins: [softDeletePlugin],
+    indexes: [
+      {
+        fields: { email: 1 },
+        options: { unique: true },
+      },
+      {
+        fields: { username: 1 },
+        options: { unique: true },
+      },
+    ],
   },
 });
 

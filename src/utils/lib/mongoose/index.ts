@@ -12,6 +12,7 @@ interface Configuration<> {
     methods?: Record<string, (this: any, ...args: any[]) => any>;
     // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-explicit-any
     statics?: Record<string, (this: any, ...args: any[]) => any>;
+    indexes?: Array<{ fields: Record<string, 1 | -1>; options?: Record<string, unknown> }>;
 }
 
 import { Model } from 'mongoose';
@@ -65,6 +66,13 @@ export class ConfigurableSchema<T = unknown, TModel extends Model<any, any, any,
         if (_.isObject(configuration.statics)) {
             _.forEach(configuration.statics, (staticFunction, staticName) => {
                 this.static(staticName, staticFunction);
+            });
+        }
+
+        // Apply indexes
+        if (_.isArray(configuration.indexes)) {
+            configuration.indexes.forEach(({ fields, options }) => {
+                this.index(fields, options);
             });
         }
     }
