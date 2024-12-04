@@ -7,7 +7,11 @@ interface Configuration<> {
     // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-explicit-any
     pre?: Record<string, Array<(this: any, next: () => void) => void | Promise<void>>>;
     // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-explicit-any
+    post?: Record<string, Array<(doc: any, next: () => void) => void | Promise<void>>>;
+    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-explicit-any
     methods?: Record<string, (this: any, ...args: any[]) => any>;
+    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-explicit-any
+    statics?: Record<string, (this: any, ...args: any[]) => any>;
 }
 
 import { Model } from 'mongoose';
@@ -41,10 +45,26 @@ export class ConfigurableSchema<T = unknown, TModel extends Model<any, any, any,
             });
         }
 
+        // Apply post-hooks
+        if (_.isObject(configuration.post)) {
+            _.forEach(configuration.post, (handlers, hook) => {
+                if (_.isArray(handlers)) {
+                    handlers.forEach((handler) => this.post(hook as RegExp | 'createCollection', handler));
+                }
+            });
+        }
+
         // Apply methods
         if (_.isObject(configuration.methods)) {
             _.forEach(configuration.methods, (methodFunction, methodName) => {
                 this.method(methodName, methodFunction);
+            });
+        }
+
+        // Apply statics
+        if (_.isObject(configuration.statics)) {
+            _.forEach(configuration.statics, (staticFunction, staticName) => {
+                this.static(staticName, staticFunction);
             });
         }
     }
