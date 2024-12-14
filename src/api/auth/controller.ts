@@ -61,8 +61,12 @@ export const login = (req: Request, res: Response, next: NextFunction): void => 
 
 export const authGoogle = async (req: Request, res: Response): Promise<void> => {
     try {
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        if (!baseUrl) {
+            throw new Error('Base URL not found');
+        }
         const redirectURL = await account.createOAuth2Token(OAuthProvider.Google,
-            `http://localhost:3000/auth/google/success`)
+            `${baseUrl}/auth/google/success`)
         res.send(redirectURL);
     } catch (error) {
         res.status(500).json({ error: error.message });
