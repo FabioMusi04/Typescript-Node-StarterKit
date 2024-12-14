@@ -1,5 +1,10 @@
 import { Router } from 'express';
-import controllers from './controller.ts';
+import controllers, { GetMe, UpdateMe, UpdateMePassword, UpdateMeProfilePicture } from './controller.ts';
+import { authenticate } from '../../services/auth/auth.ts';
+import { UsersRoleEnum } from '../../utils/enum.ts';
+import { validateBody } from '../../services/validator/body/index.ts';
+import { UpdateMePasswordSchema, UpdateMeSchema } from './middlewares/index.ts';
+import { upload } from '../../../index.ts';
 const router = Router();
 
 /**
@@ -25,7 +30,31 @@ const router = Router();
  *               items:
  *                 $ref: '#/components/schemas/User'
  */
-router.get('/', controllers.getAll);
+router.get('/', authenticate(false, [UsersRoleEnum.ADMIN]), controllers.getAll);
+
+/**
+ * @swagger
+ * /users/me:
+ *   get:
+ *     summary: Get the current user
+ *     tags: [Users]
+ *     responses:
+ *       200:
+ *         description: The current user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal Server Error
+ */
+router.get('/me', authenticate(), GetMe);
 
 /**
  * @swagger
@@ -50,7 +79,7 @@ router.get('/', controllers.getAll);
  *       404:
  *         description: User not found
  */
-router.get('/:id', controllers.getById);
+router.get('/:id', authenticate(false, [UsersRoleEnum.ADMIN]), controllers.getById);
 
 
 /**
@@ -76,7 +105,7 @@ router.get('/:id', controllers.getById);
  *       404:
  *         description: User not found
  */
-router.get('/:id/remove', controllers.remove);
+router.get('/:id/remove', authenticate(false, [UsersRoleEnum.ADMIN]), controllers.remove);
 
 /**
  * @swagger
@@ -101,7 +130,7 @@ router.get('/:id/remove', controllers.remove);
  *       404:
  *         description: User not found
  */
-router.get('/:id/restore', controllers.restore);
+router.get('/:id/restore', authenticate(false, [UsersRoleEnum.ADMIN]), controllers.restore);
 
 /**
  * @swagger
@@ -125,7 +154,111 @@ router.get('/:id/restore', controllers.restore);
  *       400:
  *         description: Bad request
  */
-router.post('/', controllers.create);
+router.post('/', authenticate(false, [UsersRoleEnum.ADMIN]), controllers.create);
+
+/**
+ * @swagger
+ * /users/me:
+ *   put:
+ *     summary: Update the current user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/User'
+ *     responses:
+ *       200:
+ *         description: The updated user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Bad request
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: User not found
+ */
+router.put('/me', authenticate(), validateBody(UpdateMeSchema), UpdateMe);
+
+/**
+ * @swagger
+ * /users/me/password:
+ *   put:
+ *     summary: Update the current user's password
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               oldPassword:
+ *                 type: string
+ *                 description: The current password
+ *               newPassword:
+ *                 type: string
+ *                 description: The new password
+ *     responses:
+ *       200:
+ *         description: Password updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Password updated successfully
+ *       400:
+ *         description: Bad request
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: User not found
+ */
+router.put('/me/password', authenticate(), validateBody(UpdateMePasswordSchema), UpdateMePassword);
+
+/**
+ * @swagger
+ * /users/me/profile-picture:
+ *   put:
+ *     summary: Update the current user's profile picture
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               profilePicture:
+ *                 type: string
+ *                 format: binary
+ *                 description: The new profile picture
+ *     responses:
+ *       200:
+ *         description: Profile picture updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Profile picture updated successfully
+ *       400:
+ *         description: Bad request
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: User not found
+ */
+router.post('/me/profile-picture', authenticate(), upload.single('file'), UpdateMeProfilePicture);
 
 /**
  * @swagger
@@ -158,7 +291,7 @@ router.post('/', controllers.create);
  *       404:
  *         description: User not found
  */
-router.put('/:id', controllers.update);
+router.put('/:id', authenticate(false, [UsersRoleEnum.ADMIN]), controllers.update);
 
 /**
  * @swagger
@@ -179,6 +312,6 @@ router.put('/:id', controllers.update);
  *       404:
  *         description: User not found
  */
-router.delete('/:id', controllers.deletePermanently);
+router.delete('/:id', authenticate(false, [UsersRoleEnum.ADMIN]), controllers.deletePermanently);
 
 export default router;

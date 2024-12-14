@@ -45,6 +45,7 @@ interface AppWriteConfig {
     projectId: string;
     apiKey: string;
     endpoint: string;
+    bucketProfileId: string;
 }
 
 interface Config {
@@ -84,7 +85,8 @@ const config: { [key in 'all' | 'test' | 'development' | 'production']: Partial<
         appwrite: {
             projectId: requireProcessEnv('APPWRITE_PROJECT_ID'),
             apiKey: requireProcessEnv('APPWRITE_API_KEY'),
-            endpoint: requireProcessEnv('APPWRITE_ENDPOINT')
+            endpoint: requireProcessEnv('APPWRITE_ENDPOINT'),
+            bucketProfileId: requireProcessEnv('APPWRITE_BUCKET_PROFILEPICTURE_ID'),
         }
     },
     test: {

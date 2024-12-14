@@ -6,6 +6,7 @@ import { generateToken } from '../../services/auth/jwt.ts';
 import client, { account } from '../../services/appwrite/index.ts';
 import { OAuthProvider, Query, Users } from 'node-appwrite';
 import _ from 'lodash';
+import Config from '../../config.ts';
 
 const users = new Users(client);
 
@@ -39,9 +40,7 @@ export const login = (req: Request, res: Response, next: NextFunction): void => 
         async (err: Error | null, user: IUser) => {
             try {
                 if (err || !user) {
-                    const error = new Error('An error occurred.');
-
-                    return next(error);
+                    return res.status(401).json({ message: err?.message || 'User not found' });
                 }
 
                 req.login(
@@ -49,10 +48,8 @@ export const login = (req: Request, res: Response, next: NextFunction): void => 
                     { session: false },
                     async (error) => {
                         if (error) return next(error);
-
                         const token = generateToken(user);
-
-                        return res.json({ token });
+                        return res.json({ token, user });
                     }
                 );
             } catch (error) {
@@ -64,11 +61,13 @@ export const login = (req: Request, res: Response, next: NextFunction): void => 
 
 export const authGoogle = async (req: Request, res: Response): Promise<void> => {
     try {
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        if (!baseUrl) {
+            throw new Error('Base URL not found');
+        }
         const redirectURL = await account.createOAuth2Token(OAuthProvider.Google,
-            `http://localhost:3000/auth/google/success`)
-        const htmlContent = `<button><a href="${redirectURL}">Sign in with Google</a></button>`;
-        res.set("Content-Type", "text/html");
-        res.send(htmlContent);
+            `${baseUrl}/auth/google/success`)
+        res.send(redirectURL);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -78,7 +77,6 @@ export const authSuccess = async (req: Request, res: Response): Promise<void> =>
     try {
         const { userId, secret } = req.query as { userId: string; secret: string };
         await account.createSession(userId, secret);
-
         const user = await users.get(userId);
 
         const identity = await users.listIdentities([Query.equal('userId', userId), Query.equal('provider', OAuthProvider.Google)]);
@@ -90,12 +88,19 @@ export const authSuccess = async (req: Request, res: Response): Promise<void> =>
         const lastName = lastNameParts.join(' ');
         const username = email.split('@')[0];
 
-        const socialProviders = _.map(identity.identities, (identity) => {
-            return {
-                providerName: identity.provider,
-                identityId: identity.$id,
-            } as SocialProvider;
+        const socialProvider = _.find(identity.identities, (identity) => {
+            return identity.provider === OAuthProvider.Google;
         });
+        if (!socialProvider) {
+            throw new Error('No Google identity found');
+        }
+
+        const socialProviders: SocialProvider[] = [
+            {
+                providerName: OAuthProvider.Google,
+                identityId: socialProvider.$id,
+            },
+        ];
 
         const userData: Partial<IUser> = {
             username,
@@ -105,28 +110,19 @@ export const authSuccess = async (req: Request, res: Response): Promise<void> =>
             lastName: lastName || '',
             role: UsersRoleEnum.USER,
         };
-        
         let existingUser = await User.findOne({
             email,
             socialProviders: {
-                $all: socialProviders,
+                $elemMatch: {
+                    providerName: OAuthProvider.Google,
+                    identityId: socialProvider.$id,
+                },
             },
         });
 
         if (!existingUser) {
-            await User.updateOne({
-                email,
-            }, userData,
-            {
-                upsert: true,
-            });
-
-            existingUser = await User.findOne({
-                email,
-                socialProviders: {
-                    $all: socialProviders,
-                },
-            });
+            existingUser = new User(userData);
+            await existingUser.save();
 
             if (!existingUser) {
                 throw new Error('There was an error creating the user');
@@ -134,9 +130,9 @@ export const authSuccess = async (req: Request, res: Response): Promise<void> =>
         }
 
         const token = generateToken(existingUser);
-        res.status(200).json({ token });
-        
+        res.redirect(Config.clientUrl + '/auth?token=' + token + '&user=' + JSON.stringify(existingUser));
+
     } catch (error) {
-        res.json({ ERROR: (error as Error).message });
+        res.status(500).json({ ERROR: (error as Error).message });
     }
 };
