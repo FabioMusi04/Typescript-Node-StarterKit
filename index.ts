@@ -5,6 +5,7 @@ import cors from 'cors';
 import connectToDatabase from './src/services/mongo/mongo.ts';
 import passportConfig from './src/services/auth/auth.ts';
 import { generalLogger, requestLogger } from './src/services/logger/winston.ts';
+import multer from "multer"
 
 const app: Application = express();
 const port: number = config.port || 3000;
@@ -18,6 +19,10 @@ app.use(cors({
     origin: [config.clientUrl],
 }));
 
+export const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 5242880 }, // 5MB file size limit
+});
 
 app.use('/', api);
 

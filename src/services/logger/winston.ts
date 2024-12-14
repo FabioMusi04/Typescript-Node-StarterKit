@@ -75,12 +75,12 @@ export const requestLogger = (req: Request, res: Response, next: NextFunction) =
 
   res.on('finish', () => {
     const { method, url } = req;
+    if (method === 'OPTIONS') return;
     const { statusCode } = res;
     const responseTime = Date.now() - start;
 
     httpLogger.http(`${method} ${url} ${statusCode} ${responseTime}ms`);
   });
-
   next();
 };
 

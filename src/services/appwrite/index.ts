@@ -1,4 +1,4 @@
-import { Account, Client } from "node-appwrite";
+import { Account, Client, Storage } from "node-appwrite";
 import Config from "../../config.ts";
 
 const client: Client = new Client();
@@ -10,6 +10,8 @@ client
 
 
 export const account = new Account(client);
+export const storage = new Storage(client);
 
+export const BucketProfilePicture = await storage.getBucket(Config.appwrite.bucketProfileId);
 
 export default client;
