@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import controllers, { GetMe, UpdateMe, UpdateMePassword, UpdateMeProfilePicture } from './controller.ts';
+import { actions } from './controller.ts';
 import { authenticate } from '../../services/auth/auth.ts';
 import { UsersRoleEnum } from '../../utils/enum.ts';
 import { validateBody } from '../../services/validator/body/index.ts';
@@ -30,7 +30,7 @@ const router = Router();
  *               items:
  *                 $ref: '#/components/schemas/User'
  */
-router.get('/', authenticate(false, [UsersRoleEnum.ADMIN]), controllers.getAll);
+router.get('/', authenticate(false, [UsersRoleEnum.ADMIN]), actions.getAll);
 
 /**
  * @swagger
@@ -54,7 +54,7 @@ router.get('/', authenticate(false, [UsersRoleEnum.ADMIN]), controllers.getAll);
  *       500:
  *         description: Internal Server Error
  */
-router.get('/me', authenticate(), GetMe);
+router.get('/me', authenticate(), actions.GetMe);
 
 /**
  * @swagger
@@ -79,7 +79,7 @@ router.get('/me', authenticate(), GetMe);
  *       404:
  *         description: User not found
  */
-router.get('/:id', authenticate(false, [UsersRoleEnum.ADMIN]), controllers.getById);
+router.get('/:id', authenticate(false, [UsersRoleEnum.ADMIN]), actions.getById);
 
 
 /**
@@ -105,7 +105,7 @@ router.get('/:id', authenticate(false, [UsersRoleEnum.ADMIN]), controllers.getBy
  *       404:
  *         description: User not found
  */
-router.get('/:id/remove', authenticate(false, [UsersRoleEnum.ADMIN]), controllers.remove);
+router.get('/:id/remove', authenticate(false, [UsersRoleEnum.ADMIN]), actions.remove);
 
 /**
  * @swagger
@@ -130,7 +130,7 @@ router.get('/:id/remove', authenticate(false, [UsersRoleEnum.ADMIN]), controller
  *       404:
  *         description: User not found
  */
-router.get('/:id/restore', authenticate(false, [UsersRoleEnum.ADMIN]), controllers.restore);
+router.get('/:id/restore', authenticate(false, [UsersRoleEnum.ADMIN]), actions.restore);
 
 /**
  * @swagger
@@ -154,7 +154,7 @@ router.get('/:id/restore', authenticate(false, [UsersRoleEnum.ADMIN]), controlle
  *       400:
  *         description: Bad request
  */
-router.post('/', authenticate(false, [UsersRoleEnum.ADMIN]), controllers.create);
+router.post('/', authenticate(false, [UsersRoleEnum.ADMIN]), actions.create);
 
 /**
  * @swagger
@@ -182,7 +182,7 @@ router.post('/', authenticate(false, [UsersRoleEnum.ADMIN]), controllers.create)
  *       404:
  *         description: User not found
  */
-router.put('/me', authenticate(), validateBody(UpdateMeSchema), UpdateMe);
+router.put('/me', authenticate(), validateBody(UpdateMeSchema), actions.UpdateMe);
 
 /**
  * @swagger
@@ -221,7 +221,7 @@ router.put('/me', authenticate(), validateBody(UpdateMeSchema), UpdateMe);
  *       404:
  *         description: User not found
  */
-router.put('/me/password', authenticate(), validateBody(UpdateMePasswordSchema), UpdateMePassword);
+router.put('/me/password', authenticate(), validateBody(UpdateMePasswordSchema), actions.UpdateMePassword);
 
 /**
  * @swagger
@@ -258,7 +258,7 @@ router.put('/me/password', authenticate(), validateBody(UpdateMePasswordSchema),
  *       404:
  *         description: User not found
  */
-router.post('/me/profile-picture', authenticate(), upload.single('file'), UpdateMeProfilePicture);
+router.post('/me/profile-picture', authenticate(), upload.single('file'), actions.UpdateMeProfilePicture);
 
 /**
  * @swagger
@@ -291,7 +291,7 @@ router.post('/me/profile-picture', authenticate(), upload.single('file'), Update
  *       404:
  *         description: User not found
  */
-router.put('/:id', authenticate(false, [UsersRoleEnum.ADMIN]), controllers.update);
+router.put('/:id', authenticate(false, [UsersRoleEnum.ADMIN]), actions.update);
 
 /**
  * @swagger
@@ -312,6 +312,6 @@ router.put('/:id', authenticate(false, [UsersRoleEnum.ADMIN]), controllers.updat
  *       404:
  *         description: User not found
  */
-router.delete('/:id', authenticate(false, [UsersRoleEnum.ADMIN]), controllers.deletePermanently);
+router.delete('/:id', authenticate(false, [UsersRoleEnum.ADMIN]), actions.deletePermanently);
 
 export default router;

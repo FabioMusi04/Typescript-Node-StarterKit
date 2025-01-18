@@ -13,5 +13,6 @@ export const account = new Account(client);
 export const storage = new Storage(client);
 
 export const BucketProfilePicture = await storage.getBucket(Config.appwrite.bucketProfileId);
+export const BucketUploads = await storage.getBucket(Config.appwrite.bucketUploadsId);
 
 export default client;

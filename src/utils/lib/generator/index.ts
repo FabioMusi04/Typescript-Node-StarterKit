@@ -12,6 +12,7 @@ type ControllerFunctions = {
     deletePermanently: (req: Request, res: Response) => Promise<void>;
     remove: (req: Request, res: Response) => Promise<void>;
     restore: (req: Request, res: Response) => Promise<void>;
+    [key: string]: (req: Request, res: Response) => Promise<void>;
 };
 /* eslint-enable no-unused-vars */
 
