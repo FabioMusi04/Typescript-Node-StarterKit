@@ -1,4 +1,4 @@
-import controllers from "./controller.ts";
+import { actions } from "./controller.ts";
 import { Router } from "express";
 import { authenticate } from "../../services/auth/auth.ts";
 import { UsersRoleEnum } from "../../utils/enum.ts";
@@ -27,7 +27,7 @@ const router = Router();
  *               items:
  *                 $ref: '#/components/schemas/UploadedFile'
  */
-router.get('/', authenticate(false, [UsersRoleEnum.ADMIN]), controllers.getAll);
+router.get('/', authenticate(false, [UsersRoleEnum.ADMIN]), actions.getAll);
 
 /**
  * @swagger
@@ -52,7 +52,7 @@ router.get('/', authenticate(false, [UsersRoleEnum.ADMIN]), controllers.getAll);
  *       404:
  *         description: Uploaded file not found
  */
-router.get('/:id', authenticate(false, [UsersRoleEnum.ADMIN]), controllers.getById);
+router.get('/:id', authenticate(false, [UsersRoleEnum.ADMIN]), actions.getById);
 
 /**
  * @swagger
@@ -76,7 +76,7 @@ router.get('/:id', authenticate(false, [UsersRoleEnum.ADMIN]), controllers.getBy
  *       400:
  *         description: Bad request
  */
-router.post('/', authenticate(false, [UsersRoleEnum.ADMIN]), controllers.create);
+router.post('/', authenticate(false, [UsersRoleEnum.ADMIN]), actions.create);
 
 /**
  * @swagger
@@ -109,7 +109,7 @@ router.post('/', authenticate(false, [UsersRoleEnum.ADMIN]), controllers.create)
  *       404:
  *         description: Uploaded file not found
  */
-router.put('/:id', authenticate(false, [UsersRoleEnum.ADMIN]), controllers.update);
+router.put('/:id', authenticate(false, [UsersRoleEnum.ADMIN]), actions.update);
 
 /**
  * @swagger
@@ -130,6 +130,6 @@ router.put('/:id', authenticate(false, [UsersRoleEnum.ADMIN]), controllers.updat
  *       404:
  *         description: Uploaded file not found
  */
-router.delete('/:id', authenticate(false, [UsersRoleEnum.ADMIN]), controllers.deletePermanently);
+router.delete('/:id', authenticate(false, [UsersRoleEnum.ADMIN]), actions.deletePermanently);
 
 export default router;
