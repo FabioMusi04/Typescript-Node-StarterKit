@@ -41,13 +41,11 @@ const userSchema = new ConfigurableSchema<IUser, UserModel, IUserMethods>({
   username: {
     type: String,
     required: true,
-    unique: true,
     q: true,
   },
   email: {
     type: String,
     required: true,
-    unique: true,
     immutable: true,
     q: true,
   },
