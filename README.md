@@ -112,6 +112,17 @@ src/
 - Integration with GitHub Actions for automated builds and deployments.
 - DockerHub pipelines for container publishing.
 
+### 11. **Appwrite Integration**
+
+- Appwrite integration for user management, authentication and buckets.
+
+### 12. **Soft Delete**
+
+- Soft delete logic for MongoDB.
+
+### 13. **Swagger UI**
+
+- Swagger UI for API documentation.
 ---
 
 ## **Getting Started**
@@ -137,7 +148,7 @@ PORT=3000
 Start the development server:
 
 ```bash
-npm run tsx
+npm run dev
 ```
 
 ### 4. **Generate API Documentation**
