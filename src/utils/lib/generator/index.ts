@@ -2,6 +2,7 @@ import { Model } from 'mongoose';
 import { Request, Response } from 'express';
 import { validateFilterFields } from '../queryFilters/index.ts';
 import { getByIdSchema, querySchema } from './middlewares/index.ts';
+import { getFieldsToPopulate } from '../populate/index.ts';
 
 /* eslint-disable no-unused-vars */
 type ControllerFunctions = {
@@ -44,14 +45,18 @@ export function generateControllers<T>(model: Model<T>, name: string): Controlle
         getAll: async (req: Request, res: Response) => {
             try {
                 const validatedQuery = querySchema.parse(req.query);
+
                 const { page = 1, limit = 10, filter = {}, sort = {} } = validatedQuery;
+
                 const filterObject = validateFilterFields(filter as string, model.schema);
+                const populateFields = getFieldsToPopulate(model.schema);
                 
                 const docs = await model
                     .find(filterObject)
                     .skip((page - 1) * limit)
                     .limit(limit)
                     .sort(sort)
+                    .populate(populateFields)
                     .exec();
 
                 const totalDocs = await model.countDocuments(filterObject);
@@ -74,10 +79,12 @@ export function generateControllers<T>(model: Model<T>, name: string): Controlle
             try {
                 const { id } = getByIdSchema.parse(req.params);
 
+                const populateFields = getFieldsToPopulate(model.schema);
+
                 const doc = await model.findOne({
                     _id: id,
-                    isDeleted: false, // Exclude soft-deleted documents
-                });
+                    isDeleted: { $ne: true },
+                }).populate(populateFields);
 
                 if (!doc) {
                     res.status(404).json({ message: `${name} not found` });
@@ -95,7 +102,7 @@ export function generateControllers<T>(model: Model<T>, name: string): Controlle
         update: async (req: Request, res: Response) => {
             try {
                 const { id } = getByIdSchema.parse(req.params);
-                const updatedDoc = await model.findOne({ _id: id, isDeleted: false });
+                const updatedDoc = await model.findOne({ _id: id, isDeleted: { $ne: true } });
                 if (!updatedDoc) {
                     res.status(404).json({ message: `${name} not found` });
                 } else {   
@@ -121,7 +128,7 @@ export function generateControllers<T>(model: Model<T>, name: string): Controlle
             try {
                 const { id } = getByIdSchema.parse(req.params);
                 const deletedDoc = await model.findOneAndUpdate(
-                    { _id: id, isDeleted: false }, // Exclude already soft-deleted documents
+                    { _id: id, isDeleted: { $ne: true } }, // Exclude already soft-deleted documents
                     { isDeleted: true, deletedAt: new Date() },
                     { new: true }
                 );

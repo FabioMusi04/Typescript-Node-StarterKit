@@ -17,6 +17,7 @@
     "useUnknownInCatchVariables": false,
     "inlineSourceMap": true,
     "resolveJsonModule": true,
+    "noImplicitThis": false,
   },
   "ts-node": {
     "esm": true

@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import { authGoogle, authSuccess, login, register } from './controller.ts';
-import { authenticate } from '../../services/auth/auth.ts';
 import { loginSchema, registerSchema } from './middlewares/index.ts';
 import { validateBody } from '../../services/validator/body/index.ts';
 

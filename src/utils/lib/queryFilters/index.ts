@@ -37,7 +37,7 @@ export function validateFilterFields(filter: string, schema: Schema): Record<str
         if (_.has(schema.paths, key)) {
             const field = schema.paths[key];
             if (field && typeof field === 'object' && 'q' in field.options && field.options.q === true) {
-                sanitizedFilter[key] = filterObject[key];
+                sanitizedFilter[key] = filterObject[key]
             } else {
                 generalLogger.warn(`Field ${key} is not queryable`);
             }
@@ -73,7 +73,7 @@ function stringToObject(str: string): Record<string, unknown> {
                     };
                 } else {
                     result[key] = {
-                        [operator]: operatorValue,
+                        [operator.replace('{', '')]: operatorValue.replace('}', ''),
                     };
                 }
             } else {
