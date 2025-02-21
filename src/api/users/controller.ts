@@ -1,15 +1,14 @@
 import { ID } from "node-appwrite";
-import Config from "../../config.ts";
+import { InputFile } from "node-appwrite/file";
 import { storage } from "../../services/appwrite/index.ts";
 import { generateControllers } from "../../utils/lib/generator/index.ts";
-import User, { IUser } from "./model.ts";
 import { Request, Response } from "express";
-import { InputFile } from "node-appwrite/file";
+import Config from "../../config.ts";
+import User, { IUser } from "./model.ts";
 
-export default generateControllers(User, "user");
+const actions = generateControllers(User, "user");
 
-
-export async function GetMe(req: Request, res: Response): Promise<void> {
+actions.GetMe = async function (req: Request, res: Response): Promise<void> {
     try {
         if (!req.user) {
             res.status(404).send({ message: "User not found" });
@@ -27,7 +26,7 @@ export async function GetMe(req: Request, res: Response): Promise<void> {
     }
 }
 
-export async function UpdateMe(req: Request, res: Response): Promise<void> {
+actions.UpdateMe = async function (req: Request, res: Response): Promise<void> {
     try {
         if (!req.user) {
             res.status(404).send({ message: "User not found" });
@@ -50,7 +49,7 @@ export async function UpdateMe(req: Request, res: Response): Promise<void> {
     }
 }
 
-export async function UpdateMePassword(req: Request, res: Response): Promise<void> {
+actions.UpdateMePassword = async function (req: Request, res: Response): Promise<void> {
     try {
         if (!req.user) {
             res.status(404).send({ message: "User not found" });
@@ -70,7 +69,7 @@ export async function UpdateMePassword(req: Request, res: Response): Promise<voi
     }
 }
 
-export async function UpdateMeProfilePicture(req: Request, res: Response): Promise<void> {
+actions.UpdateMeProfilePicture = async function (req: Request, res: Response): Promise<void> {
     try {
         if (!req.user) {
             res.status(404).send({ message: "User not found" });
@@ -136,3 +135,5 @@ export async function UpdateMeProfilePicture(req: Request, res: Response): Promi
         res.status(500).send({ message: error.message });
     }
 } */
+
+export { actions };

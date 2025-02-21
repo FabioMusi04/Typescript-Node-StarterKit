@@ -6,7 +6,7 @@ import mongooseToSwagger from 'mongoose-to-swagger';
 const LinkedEntitySchema = new Schema(
 	{
 		linkedEntityType: String,
-		linkedEntityId: String
+		linkedEntityId: Schema.Types.ObjectId,
 	},
 	{
 		_id: false,
