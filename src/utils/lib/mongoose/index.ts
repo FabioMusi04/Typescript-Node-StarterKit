@@ -1,4 +1,4 @@
-import { Schema, SchemaOptions, SchemaDefinition, SchemaDefinitionType, ResolveSchemaOptions, DefaultSchemaOptions } from 'mongoose';
+import { Model, Schema, SchemaOptions, SchemaDefinition, SchemaDefinitionType, ResolveSchemaOptions, DefaultSchemaOptions } from 'mongoose';
 import _ from 'lodash';
 
 interface Configuration<> {
@@ -15,7 +15,6 @@ interface Configuration<> {
     indexes?: Array<{ fields: Record<string, 1 | -1>; options?: Record<string, unknown> }>;
 }
 
-import { Model } from 'mongoose';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export class ConfigurableSchema<T = unknown, TModel extends Model<any, any, any, any, any, any> = Model<any, any, any, any, any, any>, TInstanceMethods = unknown> extends Schema<T, TModel, TInstanceMethods> {
