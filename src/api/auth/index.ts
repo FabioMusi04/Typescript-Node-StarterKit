@@ -62,27 +62,28 @@ router.post('/register', validateBody(registerSchema), register);
  */
 router.post('/login', validateBody(loginSchema), login);
 
-
+/**
+ * @swagger
+ * /auth/google:
+ *   get:
+ *     tags: [Auth]
+ *     summary: Authenticate with Google
+ *     responses:
+ *       302:
+ *         description: Redirects to Google for authentication.
+ */
 router.get('/google', authGoogle);
-
-router.get('/google/success', authSuccess);
 
 /**
  * @swagger
- * /auth/me:
+ * /auth/google/success:
  *   get:
- *     summary: Get current user
  *     tags: [Auth]
- *     security:
- *       - bearerAuth: []
+ *     summary: Google Authentication Success
  *     responses:
  *       200:
- *         description: Current user information
- *       401:
- *         description: Unauthorized
+ *         description: Successfully authenticated with Google.
  */
-router.get('/me', authenticate(), (req, res) => {
-    res.json(req.user);
-});
+router.get('/google/success', authSuccess);
 
 export default router;
