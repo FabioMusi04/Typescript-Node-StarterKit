@@ -4,15 +4,7 @@ export enum UsersRoleEnum {
 }
 export const UsersRoleEnumValues = Object.values(UsersRoleEnum);
 
-export enum ReservationStatusEnum {
-    "CONFIRMED" = 'confirmed',
-    "PENDING" = 'pending',
-    "CANCELLED" = 'cancelled'
-}
-export const ReservationStatusValues = Object.values(ReservationStatusEnum);
-
 export enum LinkedEntityTypeEnum {
-    "VOUCHER_IMAGE" = 'voucherImage',
-    "VOUCHER_COVER_IMAGE" = 'voucherCoverImage',
+    "IMAGE" = 'image',
 }
 export const LinkedEntityTypeValues = Object.values(LinkedEntityTypeEnum);
