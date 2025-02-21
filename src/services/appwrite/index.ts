@@ -4,7 +4,7 @@ import Config from "../../config.ts";
 const client: Client = new Client();
 
 client
-    .setEndpoint("https://cloud.appwrite.io/v1")
+    .setEndpoint(Config.appwrite.endpoint)
     .setProject(Config.appwrite.projectId)
     .setKey(Config.appwrite.apiKey);
 
