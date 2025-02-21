@@ -62,7 +62,8 @@ const generalLogger = winston.createLogger({
     timestamp(),
     colorize(),
     printf(({ level, message, timestamp, ...metadata }) => {
-      return `${timestamp} [${level}] ${message} ${JSON.stringify(metadata)}`;
+      const meta = Object.keys(metadata).length ? JSON.stringify(metadata) : '';
+      return `${timestamp} [${level}] ${message} ${meta}`;
     })
   ),
   transports: [
