@@ -22,12 +22,12 @@ passport.use(
             try {
                 const user = await User.findOne({ email });
                 if (!user) {
-                    return done(null, false, { message: 'User not found' });
+                    throw new Error('User not found');
                 }
 
-                const validate = user.isValidPassword(password);
+                const validate = await user.isValidPassword(password);
                 if (!validate) {
-                    return done(null, false, { message: 'Wrong Password' });
+                    throw new Error('Wrong Password');
                 }
 
                 return done(null, user, { message: 'Logged in Successfully' });
@@ -47,7 +47,11 @@ passport.use(
         },
         async (token, done) => {
             try {
-                return done(null, token.user);
+                const user = await User.findById(token._id);
+                if (!user) {
+                    throw new Error('User not found');
+                }
+                return done(null, user);
             } catch (error) {
                 done(error);
             }
@@ -55,7 +59,7 @@ passport.use(
     )
 );
 
-export const authenticate = (hasMasterKey?: boolean, roles?: UsersRoleEnum[], ) => {
+export const authenticate = (hasMasterKey?: boolean, roles?: UsersRoleEnum[] ) => {
     return (req: Request, res: Response, next: NextFunction) => {
         passport.authenticate('jwt', { session: false }, (err: Error | null, user: IUser | undefined) => {
             if (err) {

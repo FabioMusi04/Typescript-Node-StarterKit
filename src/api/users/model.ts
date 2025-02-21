@@ -22,7 +22,6 @@ export interface IUser extends Document {
   profilePicture?: string;
   role: UsersRoleEnum;
   socialProviders?: SocialProvider[];
-  identityId?: string;
   isActive: boolean;
   createdAt?: Date;
   updatedAt?: Date;
