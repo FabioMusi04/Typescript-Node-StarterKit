@@ -5,6 +5,7 @@ import fs from 'fs';
 import converter from 'openapi-to-postmanv2'
 import { generalLogger } from '../logger/winston.ts';
 import { readdirSync, statSync } from 'fs';
+import Config from '../../config.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename) + "/../../api";
@@ -34,7 +35,7 @@ const swaggerDefinition = {
     },
     servers: [
       {
-        url: "http://localhost:3000",
+        url: Config.ip + ":" + Config.port,
       },
     ],
     components: {
@@ -56,7 +57,7 @@ export function generatePostmanDoc() {
       }
       else {
         generalLogger.info('POSTMAN: collection generated successfully');
-        fs.writeFileSync(path.join(__dirname, 'postman.json'), JSON.stringify(conversionResult.output[0].data));
+        fs.writeFileSync(path.join(path.dirname(__filename), 'postman.json'), JSON.stringify(conversionResult.output[0].data));
       }
     }
   );

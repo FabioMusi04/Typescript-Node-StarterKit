@@ -6,7 +6,7 @@ import mongooseToSwagger from 'mongoose-to-swagger';
 const LinkedEntitySchema = new Schema(
 	{
 		linkedEntityType: String,
-		linkedEntityId: Schema.Types.ObjectId,
+		linkedEntityId: Types.ObjectId,
 	},
 	{
 		_id: false,
@@ -57,7 +57,7 @@ const uploadedFileSchema = new ConfigurableSchema<IUploadedFile>({
   timestamps: true,
 });
 
-const UploadedFiles = mongoose.model<IUploadedFile, UploadedFileModel>('UploadedFiles', uploadedFileSchema);
-export const swaggerSchema = mongooseToSwagger(UploadedFiles);
+const UploadedFile = mongoose.model<IUploadedFile, UploadedFileModel>('UploadedFile', uploadedFileSchema);
+export const swaggerSchema = mongooseToSwagger(UploadedFile);
 
-export default UploadedFiles;
+export default UploadedFile;
