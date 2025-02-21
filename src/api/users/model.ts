@@ -1,12 +1,13 @@
-import mongoose, { Document, Model } from 'mongoose';
-import crypto from 'crypto';
+import { ConfigurableSchema } from '../../utils/lib/mongoose/index.ts';
 import { UsersRoleEnum } from '../../utils/enum.ts';
+import mongoose, { Document, Model } from 'mongoose';
 import { checkFieldsAlreadyExist, hashPassword } from './middlewares/index.ts';
+import { isValidPassword, toJSON } from './utils/index.ts';
+
+import crypto from 'crypto';
 import mongooseToSwagger from 'mongoose-to-swagger';
 import softDeletePlugin from '../../utils/lib/softDelete/index.ts';
 import _ from 'lodash';
-import { isValidPassword, toJSON } from './utils/index.ts';
-import { ConfigurableSchema } from '../../utils/lib/mongoose/index.ts';
 
 export interface SocialProvider {
   providerName: string;
