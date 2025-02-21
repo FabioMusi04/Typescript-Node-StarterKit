@@ -10,11 +10,23 @@ import Config from '../../config.ts';
 
 const users = new Users(client);
 
-export const register: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+export const register: RequestHandler = async (req: Request, res: Response) => {
     try {
         const { username, email, password, firstName, lastName } = req.body;
 
+        if (_.isNil(username) || _.isNil(email) || _.isNil(password) || _.isNil(firstName) || _.isNil(lastName)) {
+            throw new Error('Missing required fields');
+        }
+
+        const foundUser = await User
+            .findOne({ $or: [{ username }, { email }] })
+
+        if (foundUser) {
+            throw new Error('User already exists, change username or email');
+        }
+
         const role: UsersRoleEnum = UsersRoleEnum.USER;
+
         const user = new User({
             username,
             email,
@@ -29,7 +41,7 @@ export const register: RequestHandler = async (req: Request, res: Response, next
 
         res.status(201).json({ message: 'User registered successfully' });
     } catch (error) {
-        next(error);
+        res.status(500).json({ details: [{ message: error.message }] });
     }
 };
 
