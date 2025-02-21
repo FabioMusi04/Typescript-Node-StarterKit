@@ -5,7 +5,7 @@
   "main": "index.ts",
   "scripts": {
     "test": "jest",
-    "tsx": "npx tsx watch index.ts",
+    "dev": "npx tsx watch index.ts",
     "docs": "npx tsx ./src/services/docs/docsgenerator.ts",
     "eslint": "eslint .",
     "seeder": "npx tsx ./src/services/mongo/seeder/index.ts"
