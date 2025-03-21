@@ -42,6 +42,7 @@ interface MongoConfig {
 }
 
 interface AppWriteConfig {
+    enabled: boolean;
     projectId: string;
     apiKey: string;
     endpoint: string;
@@ -84,6 +85,7 @@ const config: { [key in 'all' | 'test' | 'development' | 'production']: Partial<
         },
         clientUrl: process.env.CLIENT_URL || 'http://localhost:5173',
         appwrite: {
+            enabled: requireProcessEnv('APPWRITE_ENABLED') === 'true' || false,
             projectId: requireProcessEnv('APPWRITE_PROJECT_ID'),
             apiKey: requireProcessEnv('APPWRITE_API_KEY'),
             endpoint: requireProcessEnv('APPWRITE_ENDPOINT'),
