@@ -26,6 +26,7 @@
     "@types/passport-jwt": "^4.0.1",
     "@types/passport-local": "^1.0.38",
     "@types/winston": "^2.4.4",
+    "agenda": "^5.0.0",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "dotenv-safe": "^9.1.0",
