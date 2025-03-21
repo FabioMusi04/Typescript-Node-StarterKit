@@ -62,8 +62,16 @@ const generalLogger = winston.createLogger({
     timestamp(),
     colorize(),
     printf(({ level, message, timestamp, ...metadata }) => {
+      let formattedMessage: string | null | undefined = null;
+
+      if (typeof message === 'object') {
+        formattedMessage = JSON.stringify(message, null, 2);
+      } else {
+        formattedMessage = (message as string).toString();
+      }
+
       const meta = Object.keys(metadata).length ? JSON.stringify(metadata) : '';
-      return `${timestamp} [${level}] ${message} ${meta}`;
+      return `${timestamp} [${level}] ${formattedMessage} ${meta}`;
     })
   ),
   transports: [
