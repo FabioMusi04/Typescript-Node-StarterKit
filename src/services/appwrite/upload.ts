@@ -1,6 +1,3 @@
-import UploadedFile, { IUploadedFile } from "../../api/uploadedFiles/model.ts";
-import Config from "../../config.ts";
-
 import { ID } from "node-appwrite";
 import { storage } from "./index.ts";
 import { InputFile } from "node-appwrite/file";
@@ -8,8 +5,14 @@ import { generalLogger } from "../logger/winston.ts";
 import { LinkedEntityTypeEnum } from "../../utils/enum.ts";
 import { Schema } from "mongoose";
 
+import UploadedFile, { IUploadedFile } from "../../api/uploadedFiles/model.ts";
+import Config from "../../config.ts";
 
 export async function uploadImage(fileBuffer: Buffer, fileName: string, item: { userId: Schema.Types.ObjectId, _id: Schema.Types.ObjectId }, linkedEntityType: LinkedEntityTypeEnum = LinkedEntityTypeEnum.IMAGE): Promise<IUploadedFile> {
+    if (storage === null) {
+        throw new Error('Appwrite is not enabled.');
+    }
+
     try {
         const response = await storage.createFile(
             Config.appwrite.bucketUploadsId,

@@ -73,6 +73,10 @@ export const login = (req: Request, res: Response, next: NextFunction): void => 
 
 export const authGoogle = async (req: Request, res: Response): Promise<void> => {
     try {
+        if (account === null) {
+            throw new Error('Appwrite account not initialized');
+        }
+
         const baseUrl = `${req.protocol}://${req.get('host')}`;
         if (!baseUrl) {
             throw new Error('Base URL not found');
@@ -87,6 +91,10 @@ export const authGoogle = async (req: Request, res: Response): Promise<void> => 
 
 export const authSuccess = async (req: Request, res: Response): Promise<void> => {
     try {
+        if (account === null) {
+            throw new Error('Appwrite account not initialized');
+        }
+        
         const { userId, secret } = req.query as { userId: string; secret: string };
         await account.createSession(userId, secret);
         const user = await users.get(userId);
