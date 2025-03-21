@@ -1,10 +1,13 @@
 import { Job, JobAttributesData, Agenda } from "agenda";
 import Config from "../../config.ts";
+import { generalLogger } from "../logger/winston.ts";
 
 export interface AgendaService {
   start(): Promise<void>;
   stop(): Promise<void>;
+  // eslint-disable-next-line no-unused-vars
   scheduleJob(job: JobAttributesData): Promise<Job>;
+  // eslint-disable-next-line no-unused-vars
   cancelJob(jobId: string): Promise<void>;
 }
 
@@ -24,10 +27,12 @@ class AgendaServiceImpl implements AgendaService {
   }
 
   async start(): Promise<void> {
+    generalLogger.info("AGENDA: Starting Agenda");
     await this.agenda.start();
   }
 
   async stop(): Promise<void> {
+    generalLogger.info("AGENDA: Stopping Agenda");
     await this.agenda.stop();
   }
 
